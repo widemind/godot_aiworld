@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="WorldTimeline" format=3 uid="uid://dekki8eulauhb"]
+
+[ext_resource type="Script" uid="uid://dcsolxjqw7368" path="res://scripts/time/world_time_event.gd" id="1_56b63"]
+[ext_resource type="Script" uid="uid://vgr0qdlp5k0l" path="res://scripts/time/world_timeline.gd" id="2_tyunv"]
+
+[resource]
+script = ExtResource("2_tyunv")
+loop_duration = 960.0
+metadata/_custom_type_script = "uid://vgr0qdlp5k0l"
