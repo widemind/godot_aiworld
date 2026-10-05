@@ -34,6 +34,26 @@ func get_flags() -> Dictionary:
 	return _flags.duplicate(true)
 
 
+func capture_snapshot() -> Dictionary:
+	# 知识和 TextDatabase 常驻且跨世界共享，无需在切换时重建。
+	return {"flags": _flags.duplicate(true), "location": player_location}
+
+
+func restore_snapshot(snapshot: Dictionary) -> bool:
+	if WorldTime.phase == WorldTime.Phase.RUNNING or WorldTime.is_advancing() or get_tree().paused:
+		return false
+	if not snapshot.get("flags") is Dictionary or not snapshot.has("location"):
+		return false
+	_flags = snapshot["flags"].duplicate(true)
+	player_location = StringName(snapshot["location"])
+	state_changed.emit()
+	return true
+
+
+func restore_initial() -> bool:
+	return restore_snapshot({"flags": _initial_flags, "location": _initial_location})
+
+
 func meets_conditions(conditions: Dictionary) -> bool:
 	for key in conditions:
 		# 缺失标记不应误满足条件；要求 false 的标记也需在初始数据中定义。

@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="WorldTimeline" format=3 uid="uid://e6s754q6o2q3"]
+
+[ext_resource type="Script" uid="uid://vgr0qdlp5k0l" path="res://scripts/time/world_timeline.gd" id="1"]
+[ext_resource type="Script" uid="uid://dcsolxjqw7368" path="res://scripts/time/world_time_event.gd" id="2"]
+
+[sub_resource type="Resource" id="EnergyLow"]
+script = ExtResource("2")
+event_id = &"real_energy_low"
+at_seconds = 30.0
+changes = {
+&"energy_low": true
+}
+
+[sub_resource type="Resource" id="LinkReady"]
+script = ExtResource("2")
+event_id = &"real_link_ready"
+at_seconds = 60.0
+changes = {
+&"link_ready": true
+}
+
+[sub_resource type="Resource" id="LinkClosed"]
+script = ExtResource("2")
+event_id = &"real_link_closed"
+at_seconds = 90.0
+changes = {
+&"link_ready": false
+}
+
+[resource]
+script = ExtResource("1")
+loop_duration = 120.0
+initial_location = &"reality"
+initial_flags = {
+&"demo_progress": 0,
+&"energy_low": false,
+&"link_ready": false
+}
+events = Array[ExtResource("2")]([SubResource("EnergyLow"), SubResource("LinkReady"), SubResource("LinkClosed")])

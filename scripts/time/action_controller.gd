@@ -14,6 +14,8 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_PAUSABLE
 	WorldTime.event_reached.connect(_on_event_reached)
 	WorldTime.loop_ended.connect(_on_loop_ended)
+	WorldTime.real_time_ended.connect(_on_real_time_ended)
+	WorldTime.timeline_stopped.connect(_on_timeline_stopped)
 	WorldState.state_changed.connect(_on_state_changed)
 
 
@@ -97,6 +99,16 @@ func _on_state_changed() -> void:
 func _on_loop_ended(_loop_index: int) -> void:
 	if is_busy():
 		_complete(false, &"loop_ended")
+
+
+func _on_real_time_ended() -> void:
+	if is_busy():
+		_complete(false, &"real_time_ended")
+
+
+func _on_timeline_stopped() -> void:
+	if is_busy():
+		_complete(false, &"world_changed")
 
 
 func _complete(succeeded: bool, reason: StringName) -> void:

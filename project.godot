@@ -23,6 +23,7 @@ WorldState="*uid://c0qb4hn133dyv"
 ActionController="*uid://2hjtmbmcjhae"
 PauseController="*uid://c6mlute8pgrcc"
 TextDatabase="*uid://x5gt6v5mx0sy"
+WorldJourney="*res://scripts/time/world_journey.gd"
 GameCursor="*res://scenes/effect/game_cursor.tscn"
 GlobalCRT="*res://scenes/effect/global_crt.tscn"
 

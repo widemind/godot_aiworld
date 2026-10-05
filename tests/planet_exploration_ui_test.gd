@@ -81,6 +81,7 @@ func _ready() -> void:
 	_check(not _ui.is_text_open(), "仅匹配地点与操作的规则出现文本")
 	WorldState.apply_changes({&"planet_name": "测试星球", &"planet_layer": "下层"}, &"surface")
 	_check(_ui.planet_label.text == "测试星球" and _ui.layer_label.text == "下层", "地点与层级随世界状态刷新")
+	await _test_text_queue()
 	await _test_guide()
 	await _test_information_list()
 	# 循环结束时替换普通文本，关闭后正确重置。
@@ -90,9 +91,82 @@ func _ready() -> void:
 	await _send(_key(KEY_ENTER, true))
 	await _send(_key(KEY_ENTER, false))
 	_check(WorldTime.phase == WorldTime.Phase.RUNNING and WorldTime.loop_index == loop_before + 1, "关闭回溯文本开始下一轮")
+	await _test_world_journey_ui()
 	await _test_short_wait()
 	print("PLANET_EXPLORATION_UI_TEST: %s" % ("PASS" if _failures == 0 else "FAIL (%d)" % _failures))
 	get_tree().quit(0 if _failures == 0 else 1)
+
+
+func _test_world_journey_ui() -> void:
+	WorldTime.set_process(false)
+	WorldState.apply_changes({&"ui_progress": true}, &"surface")
+	var checkpoint := WorldState.capture_snapshot()
+	var loop_before := WorldTime.loop_index
+	_check(_ui.clock_label.text.begins_with("第 %d 轮 · " % loop_before) \
+		and not _ui.has_node("Header/Content/RemainingLabel") \
+		and not _ui.has_node("Header/Content/WorldSwitchButton"), "轮次在时间前，探索界面不含世界切换和剩余时间")
+	_ui.set_header_visible(false)
+	WorldTime.advance_time(1.0)
+	_ui.set_location("隐藏时更新的地点", "下层")
+	_check(not _ui.header.visible and _ui.planet_label.text == "隐藏时更新的地点", "隐藏顶部仍持续更新数据")
+	_ui.set_header_visible(true)
+	_check(_ui.header.visible and _ui.clock_label.text.ends_with("00:01"), "顶部可重新显示最新时间与地点")
+	_check(WorldJourney.return_to_reality(), "剧情接口可切换到现实")
+	_check(WorldTime.world == WorldTime.World.REAL and WorldTime.elapsed_seconds == 0.0, "剧情切换现实从零计时")
+	_check(_ui.clock_label.text == "第 %d 轮 · 00:00" % loop_before, "现实 HUD 仅显示轮次与当前时间")
+	WorldState.apply_changes({&"real_ui_progress": true}, &"reality")
+	WorldState.record_knowledge(&"ui_shared_knowledge")
+	WorldState.record_information("失败后保留的信息")
+	var real_checkpoint := WorldState.capture_snapshot()
+	_ui.show_text("现实结束前正在阅读的文本。")
+	WorldTime.advance_time(WorldTime.get_remaining_seconds())
+	_check(WorldJourney.failed and WorldTime.phase == WorldTime.Phase.ENDED \
+		and _ui.buttons[0].disabled, "现实失败停止行动")
+	_check(_ui.narrative.text == "现实结束前正在阅读的文本。", "失败提示不覆盖正在阅读的文本")
+	await _send(_key(KEY_ENTER, true))
+	await _send(_key(KEY_ENTER, false))
+	_check(WorldTime.world == WorldTime.World.REAL and _ui.narrative.text.contains("游戏失败"), "先显示失败提示，读完前不重试")
+	PauseController.set_paused(true)
+	_ui.close_text()
+	await get_tree().process_frame
+	_check(WorldJourney.failed and WorldTime.world == WorldTime.World.REAL, "暂停中关闭失败文本不会切换世界")
+	PauseController.set_paused(false)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_check(not WorldJourney.failed and WorldTime.world == WorldTime.World.VIRTUAL \
+		and WorldTime.loop_index == loop_before and WorldTime.elapsed_seconds == 0.0, "恢复后回到同一虚拟循环，从零重试")
+	_check(WorldState.capture_snapshot() == checkpoint and not _ui.is_text_open(), "重试保留虚拟进度并清理失败文本")
+	_check(WorldState.knows(&"ui_shared_knowledge") and TextDatabase.get_record_texts().has("失败后保留的信息"), "失败重试保留知识与信息")
+	_check(WorldJourney.return_to_reality(), "剧情接口再次进入现实")
+	_check(WorldState.capture_snapshot() == real_checkpoint and WorldTime.elapsed_seconds == 0.0, "再次进入现实保留现实进度并重新计时")
+	WorldTime.advance_time(1.0)
+	# 场景卸载/重载不会丢失常驻流程，失败界面重载也不能误开虚拟新轮。
+	await _reload_exploration()
+	_check(WorldTime.world == WorldTime.World.REAL and WorldTime.elapsed_seconds == 1.0 \
+		and not _ui.is_text_open(), "运行中的现实世界重载场景不重置计时")
+	WorldTime.advance_time(WorldTime.get_remaining_seconds())
+	await _reload_exploration()
+	_check(WorldJourney.failed and WorldTime.world == WorldTime.World.REAL \
+		and _ui.narrative.text.contains("游戏失败"), "失败时重载场景仍显示失败提示")
+	await _send(_key(KEY_ENTER, true))
+	await _send(_key(KEY_ENTER, false))
+	_check(WorldTime.world == WorldTime.World.VIRTUAL and WorldTime.loop_index == loop_before \
+		and WorldState.capture_snapshot() == checkpoint, "重载后的失败提示可正常重试同一循环")
+	WorldTime.advance_time(WorldTime.get_remaining_seconds())
+	await _send(_key(KEY_ENTER, true))
+	await _send(_key(KEY_ENTER, false))
+	_check(WorldTime.loop_index == loop_before + 1, "重试后的虚拟世界仍可以正常开启下一轮")
+	WorldTime.set_process(true)
+
+
+func _reload_exploration() -> void:
+	_screen.queue_free()
+	await get_tree().process_frame
+	_screen = preload("res://scenes/ui/exploration/planet_exploration.tscn").instantiate()
+	add_child(_screen)
+	_ui = _screen.get_node("PlanetExplorationUI")
+	await get_tree().process_frame
+	await get_tree().process_frame
 
 
 func _test_short_wait() -> void:
@@ -104,6 +178,10 @@ func _test_short_wait() -> void:
 	await _click(wait_position, 0.02)
 	_check(_ui.is_text_open() and WorldTime.flow_rate == 10.0, "短按等待打开文本并立即加速")
 	_check(WorldTime.elapsed_seconds == before, "短按等待不额外扣除十秒")
+	var wait_text := _ui.narrative.text
+	_ui.show_text("等待期间收到的第一条事件文本。")
+	_ui.show_text("等待期间收到的第二条事件文本。")
+	_check(_ui.narrative.text == wait_text and WorldTime.flow_rate == 10.0, "排队事件不覆盖等待文本，也不提前结束加速")
 	WorldTime._process(0.25)
 	_check(is_equal_approx(WorldTime.elapsed_seconds - before, 2.5), "等待期间世界按十倍速推进")
 	PauseController.set_paused(true)
@@ -116,9 +194,13 @@ func _test_short_wait() -> void:
 	_check(_ui.is_text_open() and WorldTime.flow_rate == 10.0, "滚轮阅读不结束等待")
 	await _send(_key(KEY_SPACE, true))
 	await _send(_key(KEY_SPACE, false))
-	_check(not _ui.is_text_open() and WorldTime.flow_rate == 2.0, "按键关闭等待文本恢复之前倍率")
+	_check(_ui.is_text_open() and _ui.narrative.text == "等待期间收到的第一条事件文本。" \
+		and WorldTime.flow_rate == 2.0, "关闭等待文本立即显示下一条，并在队列未读完时恢复之前倍率")
 	WorldTime._process(0.25)
 	_check(is_equal_approx(WorldTime.elapsed_seconds - before, 0.5), "关闭后按原倍率继续计时")
+	_ui.close_text()
+	_check(_ui.narrative.text == "等待期间收到的第二条事件文本。" and WorldTime.flow_rate == 2.0, "后续排队文本按正常倍率阅读")
+	_ui.close_text()
 	await _click(_ui.buttons[0].get_global_rect().get_center(), 0.02)
 	_check(_ui.is_text_open() and WorldTime.flow_rate == 2.0, "普通观察文本不会加速")
 	_ui.close_text()
@@ -129,10 +211,18 @@ func _test_short_wait() -> void:
 	_ui.close_text()
 	# 等待时到达循环终点，不能让加速泄漏到回溯文本或下一轮。
 	await _click(wait_position, 0.02)
+	_ui.show_text("循环终点之前已排队的事件文本。")
 	var previous_loop := WorldTime.loop_index
 	WorldTime.advance_time(WorldTime.get_remaining_seconds())
 	_check(WorldTime.phase == WorldTime.Phase.ENDED and WorldTime.flow_rate == 1.0 \
 		and _ui.is_text_open(), "加速等待到终点后显示回溯文本并还原倍率")
+	await _send(_key(KEY_ENTER, true))
+	await _send(_key(KEY_ENTER, false))
+	_check(WorldTime.loop_index == previous_loop and _ui.narrative.text == "循环终点之前已排队的事件文本。", "循环终点不丢弃已有队列，不提前开始下一轮")
+	await _send(_key(KEY_ENTER, true))
+	await _send(_key(KEY_ENTER, false))
+	_check(WorldTime.loop_index == previous_loop and _ui.is_text_open() \
+		and _ui.narrative.text.contains("世界正在回溯"), "循环终点的回溯文本排在等待文本之后，不提前重置")
 	await _send(_key(KEY_ENTER, true))
 	await _send(_key(KEY_ENTER, false))
 	_check(WorldTime.loop_index == previous_loop + 1 and WorldTime.flow_rate == 1.0, "下一轮不残留等待加速")
@@ -142,10 +232,12 @@ func _test_short_wait() -> void:
 	_check(not _ui.is_text_open() and WorldTime.flow_rate == 1.0, "点击关闭等待文本且不会再次开始等待")
 	WorldTime.set_flow_rate(3.0)
 	await _click(wait_position, 0.02)
+	_ui.show_text("暂停时关闭等待后仍需阅读的事件文本。")
 	PauseController.set_paused(true)
 	_ui.close_text()
 	PauseController.set_paused(false)
-	_check(WorldTime.flow_rate == 3.0, "暂停期间程序关闭等待文本在恢复时还原倍率")
+	_check(WorldTime.flow_rate == 3.0 and _ui.is_text_open(), "暂停期间关闭等待文本后，恢复时还原倍率并保留下一条")
+	_ui.close_text()
 	await _click(wait_position, 0.02)
 	PauseController.set_paused(true)
 	_screen.queue_free()
@@ -153,6 +245,81 @@ func _test_short_wait() -> void:
 	PauseController.set_paused(false)
 	_check(WorldTime.flow_rate == 3.0, "暂停期间卸载等待场景不遗留加速")
 	WorldTime.set_flow_rate(1.0)
+	WorldTime.set_process(true)
+
+
+func _test_text_queue() -> void:
+	WorldTime.set_process(false)
+	var closed_states: Array[String] = []
+	var on_closed := func() -> void:
+		closed_states.append(_ui.narrative.text if _ui.is_text_open() else "")
+	_ui.text_closed.connect(on_closed)
+	_ui.show_text("原文本滚动位置测试。\n\n".repeat(40))
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_ui.narrative.get_v_scroll_bar().value = 80
+	var original := _ui.narrative.text
+	var position := _ui.narrative.get_v_scroll_bar().value
+	_ui.show_text("第二条文本。")
+	var third := TextPieces.new()
+	third.text = "第三条 TextPieces 文本。"
+	third.in_information_list = true
+	_ui.show_text_piece(third)
+	_check(_ui.narrative.text == original and _ui.narrative.get_v_scroll_bar().value == position \
+		and closed_states.is_empty(), "新请求排队，不覆盖正在阅读的文本及滚动位置")
+	var requests_before := _requests.size()
+	var map_before := _map.presses
+	await _click(_ui.buttons[2].get_global_rect().get_center(), 0.02)
+	_check(_ui.narrative.text == "第二条文本。" and _ui.is_text_open() \
+		and not _ui.action_bar.visible, "点掉当前文本后立即显示下一条且不露出行动按钮")
+	_check(_requests.size() == requests_before and _map.presses == map_before, "换页点击及释放不穿透，不开启加速等待")
+	_check(_ui.narrative.get_v_scroll_bar().value == 0, "下一条从正文顶部开始")
+	await _send(_key(KEY_SPACE, true))
+	var repeated := _key(KEY_SPACE, true)
+	repeated.echo = true
+	await _send(repeated)
+	await _send(_key(KEY_SPACE, false))
+	_check(_ui.narrative.text == third.text and _ui.is_text_open(), "按键关闭一条，重复及释放不会跳过下一条")
+	_check(TextDatabase.get_record_texts().has(third.text), "排队的 TextPieces 正常收集")
+	PauseController.set_paused(true)
+	_ui.show_text("暂停期间排队的第四条文本。")
+	PauseController.set_paused(false)
+	_check(_ui.narrative.text == third.text, "暂停恢复保留当前文本及待显示队列")
+	_ui.close_text()
+	_check(_ui.narrative.text == "暂停期间排队的第四条文本。", "普通文本和 TextPieces 共用先进先出队列")
+	_ui.close_text()
+	_check(not _ui.is_text_open() and _ui.action_bar.visible and closed_states.size() == 4, "队列读完才关闭界面，每条文本均发出关闭通知")
+	# 两个实际时间轴事件在同一时刻请求显示，按事件优先级排队。
+	var event_one := WorldTimeEvent.new()
+	event_one.event_id = &"queue_test_one"
+	event_one.at_seconds = WorldTime.elapsed_seconds + 1.0
+	var event_two := WorldTimeEvent.new()
+	event_two.event_id = &"queue_test_two"
+	event_two.at_seconds = event_one.at_seconds
+	event_two.priority = 1
+	var on_event := func(event: WorldTimeEvent) -> void:
+		if event.event_id == event_one.event_id:
+			_ui.show_text("时间轴事件一。")
+		elif event.event_id == event_two.event_id:
+			_ui.show_text("时间轴事件二。")
+	WorldTime.event_reached.connect(on_event)
+	_check(WorldTime.schedule_event(event_one) and WorldTime.schedule_event(event_two), "注册实际文本事件")
+	_ui.show_text("时间轴事件发生前的正文。")
+	WorldTime.advance_time(1.0)
+	_check(_ui.narrative.text == "时间轴事件发生前的正文。", "实际时间轴事件在阅读时发生并排队")
+	_ui.close_text()
+	_check(_ui.narrative.text == "时间轴事件一。", "先展示较早处理的事件文本")
+	_ui.close_text()
+	_check(_ui.narrative.text == "时间轴事件二。", "再展示同一时刻后处理的事件文本")
+	_ui.close_text()
+	WorldTime.event_reached.disconnect(on_event)
+	_ui.show_text("即将清理的当前文本。")
+	_ui.show_text("即将清理的排队文本。")
+	_ui.clear_texts()
+	_ui.show_text("清理后的新文本。")
+	_ui.close_text()
+	_check(not _ui.is_text_open(), "主动清理不会把旧队列留给下次阅读")
+	_ui.text_closed.disconnect(on_closed)
 	WorldTime.set_process(true)
 
 

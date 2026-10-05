@@ -6,14 +6,19 @@ signal event_reached(event: WorldTimeEvent)
 signal loop_reset(loop_index: int)
 signal loop_started(loop_index: int)
 signal loop_ended(loop_index: int)
+signal real_time_ended
+signal timeline_stopped
+signal timeline_started(world: int, loop_index: int)
 
 enum Phase { READY, RUNNING, ENDED, RESETTING }
+enum World { VIRTUAL, REAL }
 
 var elapsed_seconds: float = 0.0
 var loop_duration: float = 600.0
 var flow_rate: float = 1.0
 var loop_index: int = 0
 var phase: Phase = Phase.READY
+var world: World = World.VIRTUAL
 
 var _schedule: Array[WorldTimeEvent] = []
 var _pending: Array[Dictionary] = []
@@ -49,13 +54,8 @@ func is_advancing() -> bool:
 
 
 func configure(duration: float, events: Array[WorldTimeEvent]) -> bool:
-	if phase == Phase.RUNNING or _advancing or not is_finite(duration) or duration <= 0.0:
+	if phase == Phase.RUNNING or _advancing or not is_valid_configuration(duration, events):
 		return false
-	var ids: Dictionary = {}
-	for event in events:
-		if not _valid_event(event, duration) or ids.has(event.event_id):
-			return false
-		ids[event.event_id] = true
 	loop_duration = duration
 	_schedule.clear()
 	for event in events:
@@ -63,30 +63,86 @@ func configure(duration: float, events: Array[WorldTimeEvent]) -> bool:
 	return true
 
 
+func is_valid_configuration(duration: float, events: Array[WorldTimeEvent]) -> bool:
+	if not is_finite(duration) or duration <= 0.0:
+		return false
+	var ids: Dictionary = {}
+	for event in events:
+		if not _valid_event(event, duration) or ids.has(event.event_id):
+			return false
+		ids[event.event_id] = true
+	return true
+
+
 func start_loop() -> bool:
-	if _advancing or get_tree().paused or phase == Phase.RUNNING:
+	if world != World.VIRTUAL:
+		return false
+	return _start_timeline(true, true)
+
+
+func restart_virtual_loop(saved_loop_index: int) -> bool:
+	# 失败后的重试沿用同一轮编号与已恢复的进度，不触发 loop_reset。
+	if world != World.VIRTUAL or saved_loop_index < 1 or not _can_start():
+		return false
+	loop_index = saved_loop_index
+	return _start_timeline(false, false, false)
+
+
+func start_real_time(resuming_progress: bool = false) -> bool:
+	if world != World.REAL:
+		return false
+	return _start_timeline(false, false, not resuming_progress)
+
+
+func change_world(kind: World, duration: float, events: Array[WorldTimeEvent]) -> bool:
+	# 先验证再停表。停止信号取消旧世界的行动，绝不伪造循环结束。
+	if _advancing or get_tree().paused or not is_valid_configuration(duration, events):
+		return false
+	phase = Phase.READY
+	flow_rate = 1.0
+	timeline_stopped.emit()
+	_pending.clear()
+	_registered_ids.clear()
+	world = kind
+	return configure(duration, events)
+
+
+func _can_start() -> bool:
+	return not _advancing and not get_tree().paused and phase != Phase.RUNNING
+
+
+func _start_timeline(next_loop: bool, reset_world: bool, initialize_events: bool = true) -> bool:
+	if not _can_start():
 		return false
 	elapsed_seconds = 0.0
 	flow_rate = 1.0
-	loop_index += 1
+	if next_loop:
+		loop_index += 1
 	_pending.clear()
 	_registered_ids.clear()
 	_sequence = 0
 	phase = Phase.RUNNING
 	for event in _schedule:
-		schedule_event(event)
+		# 恢复进度时快照已经包含零时刻初始化，不能再次覆盖已完成的操作。
+		if not initialize_events and event.at_seconds == 0.0:
+			_registered_ids[event.event_id] = true
+		else:
+			schedule_event(event)
 	# 先恢复世界，再执行零时刻事件，最后允许场景显示新一轮状态。
 	_advancing = true
-	loop_reset.emit(loop_index)
+	if reset_world:
+		loop_reset.emit(loop_index)
 	_dispatch_due_events()
 	_advancing = false
 	time_changed.emit(0.0, 0.0)
-	loop_started.emit(loop_index)
+	if world == World.VIRTUAL:
+		loop_started.emit(loop_index)
+	timeline_started.emit(world, loop_index)
 	return true
 
 
 func begin_reset() -> bool:
-	if phase != Phase.ENDED or _advancing or get_tree().paused:
+	if world != World.VIRTUAL or phase != Phase.ENDED or _advancing or get_tree().paused:
 		return false
 	phase = Phase.RESETTING
 	return true
@@ -143,7 +199,10 @@ func advance_time(seconds: float) -> float:
 			flow_rate = 1.0
 			_pending.clear()
 			time_changed.emit(previous, elapsed_seconds)
-			loop_ended.emit(loop_index)
+			if world == World.VIRTUAL:
+				loop_ended.emit(loop_index)
+			else:
+				real_time_ended.emit()
 			break
 		_dispatch_due_events()
 		if elapsed_seconds != previous:
@@ -162,6 +221,14 @@ func skip_to(target_seconds: float) -> float:
 
 func get_remaining_seconds() -> float:
 	return maxf(0.0, loop_duration - elapsed_seconds)
+
+
+func get_pending_events() -> Array[WorldTimeEvent]:
+	# 按实际执行顺序返回副本，供演示/调试查看，不暴露可修改的队列。
+	var result: Array[WorldTimeEvent] = []
+	for entry in _pending:
+		result.append((entry["event"] as WorldTimeEvent).duplicate(true) as WorldTimeEvent)
+	return result
 
 
 func _dispatch_due_events() -> void:
