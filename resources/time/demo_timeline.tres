@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="WorldTimeline" format=3 uid="uid://dne7fpo86vp0u"]
+
+[ext_resource type="Script" uid="uid://vgr0qdlp5k0l" path="res://scripts/time/world_timeline.gd" id="1_timeline"]
+[ext_resource type="Script" uid="uid://dcsolxjqw7368" path="res://scripts/time/world_time_event.gd" id="2_event"]
+
+[sub_resource type="Resource" id="Resource_gate_open"]
+script = ExtResource("2_event")
+event_id = &"gate_open"
+at_seconds = 180.0
+changes = {
+&"gate_open": true
+}
+
+[sub_resource type="Resource" id="Resource_machine_start"]
+script = ExtResource("2_event")
+event_id = &"machine_start"
+at_seconds = 240.0
+changes = {
+&"machine_running": true
+}
+
+[sub_resource type="Resource" id="Resource_gate_close"]
+script = ExtResource("2_event")
+event_id = &"gate_close"
+at_seconds = 280.0
+changes = {
+&"gate_open": false
+}
+
+[resource]
+script = ExtResource("1_timeline")
+initial_flags = {
+&"deciphered": false,
+&"gate_open": false,
+&"machine_running": false
+}
+events = Array[ExtResource("2_event")]([SubResource("Resource_gate_open"), SubResource("Resource_machine_start"), SubResource("Resource_gate_close")])
