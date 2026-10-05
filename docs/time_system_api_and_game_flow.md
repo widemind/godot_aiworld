@@ -10,10 +10,13 @@
 - 第 3～6 节：各个服务的接口、返回值和信号。
 - 第 7 节：常驻主流程、地点移动、操作、等待和场景变化的构建示例。
 - 第 8～10 节：执行顺序、常见错误和关卡接入验收。
+- 第 11 节：当前项目的虚拟/现实两世界流程与进度恢复。
+
+当前探索入口已接入第 11 节的 WorldJourney。第 2～10 节的直接 `install()` / `start_loop()` 流程是基础虚拟循环示例；两世界游戏的启动与切换应交给 WorldJourney，现实终点不能走虚拟循环的重置流程。
 
 ## 1. 先理解数据与时间的关系
 
-系统由四个 Autoload 和三个配置资源组成。
+时间系统由五个 Autoload 和三个配置资源组成，另与常驻 TextDatabase 共享已获取的信息。
 
 | 类型 | 名称 | 保存或负责的内容 |
 | --- | --- | --- |
@@ -21,6 +24,7 @@
 | 全局服务 | `WorldState` | 玩家位置、本轮标记、跨轮知识记录 |
 | 全局服务 | `ActionController` | 当前行动、条件检查、行动完成与取消 |
 | 全局服务 | `PauseController` | 暂停输入、场景树暂停与通知 |
+| 全局服务 | `WorldJourney` | 当前世界、两世界进度快照、失败与重试 |
 | Resource | `WorldTimeline` | 单轮长度、初始世界和固定事件表 |
 | Resource | `WorldTimeEvent` | 某个时刻发生的世界变化 |
 | Resource | `WorldAction` | 一次行动的时长、条件、结果和目的地 |
@@ -655,4 +659,51 @@ func _process(_delta: float) -> void:
 | 行动完成时刻等于终点 | 行动失败，进入重置展示 |
 | 下一轮再次到达相同时刻 | 固定事件重复发生，本轮结果清空、知识保留 |
 
-示例中的 180 秒入口开启、240 秒装置启动、260 秒入口关闭和 600 秒终点只是演示时间表。正式剧情规则可以替换资源配置，无需重写时钟服务。
+示例中的 180 秒入口开启、240 秒装置启动、280 秒入口关闭和 600 秒终点只是演示时间表。正式剧情规则可以替换资源配置，无需重写时钟服务。
+
+## 11. 虚拟世界、现实世界与失败重试
+
+启动入口配置两个 WorldTimeline：`timeline` 是虚拟世界，`real_timeline` 是现实世界。调用 `WorldJourney.start(virtual_timeline, real_timeline) -> bool` 验证并复制两个资源，从虚拟第一轮启动。`is_started()` 用于避免场景重载时再次启动。
+
+| WorldJourney 接口/信号 | 规则 |
+| --- | --- |
+| `return_to_reality() -> bool` | 从正在运行的虚拟世界保存 flags、位置、轮号，切换到现实，时间归零；首次使用现实初始状态，后续恢复现实快照 |
+| `return_to_virtual() -> bool` | 从现实运行或失败状态返回，保存现实进度，恢复最后离开的虚拟轮号、flags 和位置，时间归零 |
+| `failed: bool` | 现实终点后为 true；成功重新进入世界后清除 |
+| `get_saved_progress(world: int) -> Dictionary` | 读取指定世界 flags/location 的深拷贝；当前世界返回当前状态 |
+| `world_changed(world: int)` | 切换并启动成功后发出 |
+| `game_failed` | 每次现实尝试达到终点时发出一次 |
+
+所有切换要求未暂停、非时间结算中且没有其他切换正在执行；在事件、行动完成或失败回调中切换时使用延迟调用。服务层取消尚未完成的旧世界行动，原因 `world_changed`。探索 UI 不提供切换按钮，交由剧情接口触发；完整时间演示保留切换按钮，也允许行动中切换以验证取消行为。
+
+```gdscript
+# 启动入口；普通地点只读取状态。
+if not WorldJourney.is_started():
+	WorldJourney.start(virtual_timeline, real_timeline)
+
+# 装置或交互完成后；若位于事件回调中则延迟执行。
+WorldJourney.return_to_reality.call_deferred()
+
+# 失败界面确认后返回最后一轮。
+WorldJourney.return_to_virtual.call_deferred()
+```
+
+`WorldTime.world` 是 `WorldTime.World.VIRTUAL` 或 `REAL`。共用一个时钟，每次世界切换安装对应时间表，只推进当前世界；进入现实和返回虚拟都会重新计时。现实世界沿用最后一个虚拟轮号作为进度标识，绝不增加轮号。
+
+| WorldTime 新接口/信号 | 用途 |
+| --- | --- |
+| `change_world(kind, duration, events) -> bool` | 验证配置、停表、取消行动并换世界；业务优先通过 WorldJourney 调用 |
+| `start_real_time(resuming_progress = false) -> bool` | 只允许现实世界，时间归零，不重置 flags，不增加轮号 |
+| `restart_virtual_loop(saved_loop_index) -> bool` | 只允许虚拟世界，沿用轮号，从零计时，不发出 loop_reset |
+| `timeline_stopped` | 切换停止旧时间表时发出 |
+| `timeline_started(world, loop_index)` | 每次虚拟/现实时间表启动后发出，HUD 可统一监听 |
+| `real_time_ended` | 只在现实终点发出；替代 loop_ended，行动取消原因 real_time_ended |
+| `get_pending_events() -> Array[WorldTimeEvent]` | 按实际执行顺序返回尚未发生事件的深拷贝，包括行动完成事件；修改返回值不影响队列 |
+
+现实世界的 `start_loop()` / `begin_reset()` 均被拒绝。失败不暂停 SceneTree，而是进入 ENDED，阻止推进与行动；UI 仍能阅读提示并打开暂停菜单。当前探索入口读完已有文本及失败提示后恢复虚拟最后一轮。再次进入现实仍保留此前现实 flags/位置，并获得完整新计时。
+
+WorldState 的 `capture_snapshot()` 返回 flags/location 的深拷贝，`restore_snapshot(snapshot) -> bool` 在非运行、非结算且未暂停时恢复，`restore_initial()` 用于首次进入现实。知识与 TextDatabase 信息跨世界共享且不重建。快照恢复不重放零时刻初始化，避免覆盖已完成的操作；其他时间事件随着新计时再次发生。虚拟世界自然开启下一轮时仍执行零时刻事件并重置临时 flags/位置，知识和信息保留。
+
+当前“进度保留”覆盖 WorldState 的 flags/位置、知识和 TextDatabase 信息，保存于本次运行内存。地点节点自己保存的局部变量不属于快照；需要保留的业务进度应写入 WorldState。尚未提供退出游戏后的磁盘存档。
+
+`tests/world_journey_test.tscn` 验证独立世界进度、暂停切换拒绝、自然循环、现实失败、终点行动取消、快照深拷贝、反复失败重试、零时刻保护和共享知识信息。`tests/planet_exploration_ui_test.tscn` 验证实际按钮输入、顶部显隐、失败文本排队、暂停恢复和现实运行/失败时的场景重载。`tests/time_system_demo_test.tscn` 验证完整演示的操作、实际事件队列、动态同刻事件与取消、行动条件、失败重试和场景重载。

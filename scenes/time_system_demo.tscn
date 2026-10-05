@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://btvljwiycb4nw"]
 
 [ext_resource type="Script" uid="uid://w1d45o8orulm" path="res://scripts/time/time_system_demo.gd" id="1_demo"]
+[ext_resource type="Theme" uid="uid://cawvok3tinuh7" path="res://resources/ui/theme.tres" id="1_ubuq1"]
+[ext_resource type="PackedScene" uid="uid://cdv4cfdj5j5ms" path="res://scenes/effect/starfield_background.tscn" id="2_background"]
 
 [node name="TimeSystemDemo" type="Control" unique_id=1278654811]
 layout_mode = 3
@@ -9,14 +11,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_ubuq1")
 script = ExtResource("1_demo")
 
-[node name="Background" type="ColorRect" parent="." unique_id=451981272]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(0.055, 0.075, 0.11, 1)
+[node name="StarfieldBackground" parent="." unique_id=623105282 instance=ExtResource("2_background")]

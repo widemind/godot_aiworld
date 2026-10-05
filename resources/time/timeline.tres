@@ -3,7 +3,30 @@
 [ext_resource type="Script" uid="uid://dcsolxjqw7368" path="res://scripts/time/world_time_event.gd" id="1_56b63"]
 [ext_resource type="Script" uid="uid://vgr0qdlp5k0l" path="res://scripts/time/world_timeline.gd" id="2_tyunv"]
 
+[sub_resource type="Resource" id="Resource_6gbaa"]
+script = ExtResource("1_56b63")
+event_id = &"sunlight_up"
+at_seconds = 600.0
+changes = {
+&"sunlight_up": true
+}
+metadata/_custom_type_script = "uid://dcsolxjqw7368"
+
+[sub_resource type="Resource" id="Resource_s2ddq"]
+script = ExtResource("1_56b63")
+event_id = &"mercury_open"
+at_seconds = 660.0
+changes = {
+&"mercury_open": true
+}
+metadata/_custom_type_script = "uid://dcsolxjqw7368"
+
 [resource]
 script = ExtResource("2_tyunv")
 loop_duration = 960.0
+initial_flags = {
+&"mercury_open": false,
+&"sunlight_up": false
+}
+events = Array[ExtResource("1_56b63")]([SubResource("Resource_6gbaa"), SubResource("Resource_s2ddq")])
 metadata/_custom_type_script = "uid://vgr0qdlp5k0l"

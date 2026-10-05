@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="AIWORLD"
-run/main_scene="res://scenes/time_system_demo.tscn"
+run/main_scene="res://scenes/ui/exploration/planet_exploration.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -23,6 +23,9 @@ WorldState="*uid://c0qb4hn133dyv"
 ActionController="*uid://2hjtmbmcjhae"
 PauseController="*uid://c6mlute8pgrcc"
 TextDatabase="*uid://x5gt6v5mx0sy"
+WorldJourney="*res://scripts/time/world_journey.gd"
+GameCursor="*res://scenes/effect/game_cursor.tscn"
+GlobalCRT="*res://scenes/effect/global_crt.tscn"
 
 [display]
 
