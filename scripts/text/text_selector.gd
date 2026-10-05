@@ -38,7 +38,7 @@ func special_text_selection(action:StringName) -> TextPieces:
 func text_selection(action:StringName) -> TextPieces:
 	var text_pieces:TextPieces = null
 	text_pieces = special_text_selection(action)
-	if not discard_basic_text_selection:
+	if not discard_basic_text_selection and text_pieces == null:
 		match action:
 			"observe":
 				text_pieces = list_text_selection(text_when_observed)
@@ -60,8 +60,7 @@ func text_selection(action:StringName) -> TextPieces:
 				push_error("Nonexistent action was passed into TextSelector")
 	if text_pieces == null:
 		text_pieces = TextDatabase.default_text_pieces
-	elif text_pieces.in_information_list:
-		TextDatabase.text_collection_list.append(text_pieces.duplicate(true))
+	TextDatabase.collect_text(text_pieces.duplicate(true))
 	return text_pieces
 
 ## 列表内文本筛选器，按优先级选择文本
@@ -72,6 +71,8 @@ func list_text_selection(list:Array[TextPieces]) -> TextPieces:
 	else:
 		var selected_pieces:TextPieces = null
 		for pieces in list:
+			if pieces == null:
+				continue
 			if pieces.time_requirements < WorldTime.elapsed_seconds:
 				continue
 			elif len(pieces.text_requirements.keys()) == 0:
@@ -85,8 +86,9 @@ func list_text_selection(list:Array[TextPieces]) -> TextPieces:
 						break
 				if requirements_passed:
 					selected_pieces = pieces
+					break
 		if selected_pieces:
 			text_pieces = selected_pieces
 		else:
-			text_pieces = list[len(list) - 1]
+			text_pieces = null
 	return text_pieces
