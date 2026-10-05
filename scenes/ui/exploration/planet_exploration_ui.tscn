@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://b0ey6v160yc3g" path="res://scripts/effect/cursor_frame_button.gd" id="3_cursor"]
 [ext_resource type="Theme" uid="uid://cawvok3tinuh7" path="res://resources/ui/planet_exploration_theme.tres" id="4_theme"]
 [ext_resource type="PackedScene" path="res://scenes/ui/information/information_list.tscn" id="5_information"]
+[ext_resource type="PackedScene" path="res://scenes/ui/guide/guide_ui.tscn" id="6_guide"]
 
 [node name="PlanetExplorationUI" type="Control"]
 process_mode = 3
@@ -241,6 +242,11 @@ text = "返回主菜单"
 unique_name_in_owner = true
 layout_mode = 1
 
+[node name="GuideUI" parent="." instance=ExtResource("6_guide")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[connection signal="closed" from="GuideUI" to="." method="_on_guide_closed"]
 [connection signal="closed" from="InformationList" to="." method="_on_information_list_closed"]
 [connection signal="action_requested" from="ActionBar/Buttons/ObserveButton" to="." method="_on_action_requested"]
 [connection signal="button_down" from="ActionBar/Buttons/ObserveButton" to="ActionBar/Buttons/ObserveButton" method="_begin_hold"]
@@ -258,3 +264,5 @@ layout_mode = 1
 [connection signal="pressed" from="PauseModal/Panel/Column/InformationListButton" to="." method="_on_information_list_pressed"]
 [connection signal="pressed" from="PauseModal/Panel/Column/GuideButton" to="." method="_on_guide_pressed"]
 [connection signal="pressed" from="PauseModal/Panel/Column/MainMenuButton" to="." method="_on_main_menu_pressed"]
+
+[editable path="GuideUI"]

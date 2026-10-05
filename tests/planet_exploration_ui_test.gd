@@ -80,6 +80,7 @@ func _ready() -> void:
 	_check(not _ui.is_text_open(), "仅匹配地点与操作的规则出现文本")
 	WorldState.apply_changes({&"planet_name": "测试星球", &"planet_layer": "下层"}, &"surface")
 	_check(_ui.planet_label.text == "测试星球" and _ui.layer_label.text == "下层", "地点与层级随世界状态刷新")
+	await _test_guide()
 	await _test_information_list()
 	# 循环结束时替换普通文本，关闭后正确重置。
 	var loop_before := WorldTime.loop_index
@@ -208,8 +209,12 @@ func _test_information_list() -> void:
 	_ui._on_information_list_pressed()
 	await get_tree().process_frame
 	_check(page.scroll.scroll_vertical == 0, "重开列表从最新文本开始")
-	await _click(page.back_button.get_global_rect().get_center(), 0.02)
-	_check(not page.visible and get_tree().paused, "返回按钮回到暂停菜单")
+	if page.back_button.is_visible_in_tree():
+		await _click(page.back_button.get_global_rect().get_center(), 0.02)
+	else:
+		await _send(_key(KEY_ESCAPE, true))
+		await _send(_key(KEY_ESCAPE, false))
+	_check(not page.visible and get_tree().paused, "列表返回暂停菜单（兼容编辑器隐藏返回按钮）")
 	PauseController.set_paused(false)
 	_ui.close_text()
 	WorldState.apply_changes({&"in_space": true}, &"space")
@@ -232,6 +237,71 @@ func _test_information_list() -> void:
 	_ui.close_text()
 	await get_tree().process_frame
 	_check(WorldState.get_collected_information().size() == count, "信息记录跨世界循环保留")
+	WorldTime.set_process(true)
+
+
+func _test_guide() -> void:
+	WorldTime.set_process(false)
+	var page := _ui.guide
+	var author_text := page.tutorial.text
+	page.tutorial.text = "教程测试正文会随宽度换行。".repeat(24) + "\n\n居中的教程段落。\n\n".repeat(40)
+	_ui.show_text("保留的游戏正文。\n\n".repeat(40))
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_ui.narrative.get_v_scroll_bar().value = 80
+	var reading_position := _ui.narrative.get_v_scroll_bar().value
+	var time_before := WorldTime.elapsed_seconds
+	var information_count := WorldState.get_collected_information().size()
+	PauseController.set_paused(true)
+	await _click(_ui.get_node("%GuideButton").get_global_rect().get_center(), 0.02)
+	_check(page.visible and not _ui.pause_modal.visible and get_tree().paused, "指南按钮打开指南并保持世界暂停")
+	_check(page.location_label.text == "测试星球" and page.layer_label.text == "下层" \
+		and page.clock_label.text == _ui.clock_label.text, "指南标题显示打开时的时间与地点")
+	_check(page.tutorial.horizontal_alignment == HORIZONTAL_ALIGNMENT_CENTER, "教程正文居中对齐")
+	_check(page.tutorial.text.contains("教程测试正文"), "打开指南保留作者填写的正文")
+	await get_tree().process_frame
+	await _send(_mouse(MOUSE_BUTTON_WHEEL_DOWN, true, page.scroll.get_global_rect().get_center()))
+	_check(page.scroll.scroll_vertical > 0 and page.visible, "暂停中可滚动长教程")
+	_check(not page.scroll.get_v_scroll_bar().visible, "教程滚动条隐藏")
+	WorldTime._process(1.0)
+	_check(WorldTime.elapsed_seconds == time_before, "阅读指南不推进世界时间")
+	_ui.set_location("其他星球", "一层")
+	_ui._on_time_changed(0.0, 123.0)
+	_check(page.location_label.text == "测试星球" and page.clock_label.text != "02:03", "指南标题保持打开时的快照")
+	var original_scale_size := get_window().content_scale_size
+	var original_height := page.tutorial.size.y
+	get_window().content_scale_size = Vector2i(960, 540)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_check(page.tutorial.size.y > original_height and page.tutorial.size.x <= page.scroll.size.x, "窄窗口教程自动换行且不横向溢出")
+	get_window().content_scale_size = original_scale_size
+	await get_tree().process_frame
+	await get_tree().process_frame
+	await _send(_key(KEY_ESCAPE, true))
+	var repeat_escape := _key(KEY_ESCAPE, true)
+	repeat_escape.echo = true
+	await _send(repeat_escape)
+	await _send(_key(KEY_ESCAPE, false))
+	_check(not page.visible and _ui.pause_modal.visible and get_tree().paused, "Esc 及重复输入仅返回暂停菜单")
+	_check(_ui.is_text_open() and _ui.narrative.get_v_scroll_bar().value == reading_position, "指南返回保留原游戏阅读位置")
+	_ui._on_guide_pressed()
+	await get_tree().process_frame
+	_check(page.scroll.scroll_vertical == 0, "重新打开教程从顶部开始")
+	PauseController.set_paused(false)
+	_check(not page.visible and not _ui.pause_modal.visible, "外部恢复游戏会关闭指南")
+	_ui.close_text()
+	WorldState.apply_changes({&"in_space": true}, &"space")
+	PauseController.set_paused(true)
+	_ui._on_guide_pressed()
+	_check(page.location_label.text == "太空" and page.layer_label.text.is_empty(), "指南在太空显示太空并隐藏层级")
+	await _send(_key(KEY_ENTER, true))
+	await _send(_key(KEY_ENTER, false))
+	_check(not page.visible and get_tree().paused, "确认键返回不会穿透并恢复游戏")
+	PauseController.set_paused(false)
+	page.tutorial.text = author_text
+	WorldState.apply_changes({&"in_space": false, &"planet_name": "测试星球", &"planet_layer": "下层"}, &"surface")
+	_ui._on_time_changed(0.0, WorldTime.elapsed_seconds)
+	_check(WorldState.get_collected_information().size() == information_count, "指南不作为获取信息加入列表")
 	WorldTime.set_process(true)
 
 

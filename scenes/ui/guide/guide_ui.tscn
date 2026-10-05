@@ -93,5 +93,3 @@ theme_override_constants/line_spacing = 10
 text = "指南文本"
 horizontal_alignment = 1
 autowrap_mode = 3
-
-[editable path="Frame/Body/GuideScroll/GuideText"]
