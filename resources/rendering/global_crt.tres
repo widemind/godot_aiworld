@@ -1,0 +1,27 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://cwc8kgjhq7o8j"]
+
+[ext_resource type="Shader" uid="uid://bgeuebbgajj28" path="res://shaders/crt.gdshader" id="1_crt"]
+
+[resource]
+shader = ExtResource("1_crt")
+shader_parameter/overlay = true
+shader_parameter/resolution = Vector2(1080, 720)
+shader_parameter/brightness = 1.01
+shader_parameter/scanlines_opacity = 0.0400000019
+shader_parameter/scanlines_width = 0.0470000022325
+shader_parameter/grille_opacity = 0.05400000256499999
+shader_parameter/roll = false
+shader_parameter/roll_speed = 8.0
+shader_parameter/roll_size = 97.3430046237925
+shader_parameter/roll_variation = 1.3770000621476202
+shader_parameter/distort_intensity = 0.010000000475
+shader_parameter/aberration = 0.01000004797499998
+shader_parameter/noise_opacity = 0.0190000009025
+shader_parameter/noise_speed = 7.78
+shader_parameter/static_noise_intensity = 0.19600000931
+shader_parameter/pixelate = false
+shader_parameter/discolor = true
+shader_parameter/warp_amount = 0.1310000062225
+shader_parameter/clip_warp = false
+shader_parameter/vignette_intensity = 0.4
+shader_parameter/vignette_opacity = 0.5

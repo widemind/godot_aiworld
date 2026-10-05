@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://cdv4cfdj5j5ms"]
+
+[ext_resource type="Script" uid="uid://ba5vg38d8827e" path="res://scripts/starfield_background.gd" id="1_starfield"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_distribution"]
+seed = 137
+frequency = 0.008
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_distribution"]
+noise = SubResource("FastNoiseLite_distribution")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_appearance"]
+seed = 797
+frequency = 0.06
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_appearance"]
+noise = SubResource("FastNoiseLite_appearance")
+
+[node name="StarfieldBackground" type="Node2D" unique_id=105787829]
+z_index = -100
+script = ExtResource("1_starfield")
+background_color = Color(0.054573774, 0.054573774, 0.05457376, 1)
+density_range = Vector2(0.5, 1.5)
+distribution_noise = SubResource("NoiseTexture2D_distribution")
+appearance_noise = SubResource("NoiseTexture2D_appearance")
+radius_range = Vector2(1, 1.8)
+color_from = Color(0.88235295, 0.9019608, 1, 1)
+color_to = Color(1, 1, 1, 1)

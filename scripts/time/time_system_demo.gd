@@ -15,6 +15,8 @@ var _messages: Array[String] = []
 
 
 func _ready() -> void:
+	resized.connect(_resize_background)
+	_resize_background()
 	_build_interface()
 	WorldTime.time_changed.connect(_on_time_changed)
 	WorldTime.event_reached.connect(_on_event_reached)
@@ -37,6 +39,10 @@ func _ready() -> void:
 			_action_label.text = "当前没有进行中的行动。"
 		_reset_panel.visible = WorldTime.phase != WorldTime.Phase.RUNNING
 	_on_pause_changed(get_tree().paused)
+
+
+func _resize_background() -> void:
+	$StarfieldBackground.set(&"field_size", size)
 
 
 func _build_interface() -> void:
