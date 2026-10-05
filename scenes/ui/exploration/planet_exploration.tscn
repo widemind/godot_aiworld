@@ -1,0 +1,161 @@
+[gd_scene format=3 uid="uid://cxtp8kmlsdu5e"]
+
+[ext_resource type="Script" uid="uid://h63m55hdbgxw" path="res://scripts/exploration/planet_exploration.gd" id="1_rdjtn"]
+[ext_resource type="Resource" path="res://resources/exploration/preview_timeline.tres" id="2_xtue3"]
+[ext_resource type="Script" uid="uid://b26nl7b1jjfv6" path="res://scripts/exploration/exploration_response.gd" id="3_orxqf"]
+[ext_resource type="PackedScene" path="res://scenes/ui/exploration/planet_exploration_ui.tscn" id="4_hae5q"]
+
+[sub_resource type="Resource" id="ObserveShort"]
+script = ExtResource("3_orxqf")
+location_id = &"surface"
+text = "你停下来，观察这片星球的上层。
+
+远处的轮廓在黑暗中保持沉默。"
+
+[sub_resource type="Resource" id="ObserveLong"]
+script = ExtResource("3_orxqf")
+location_id = &"surface"
+long_press = true
+duration_seconds = 5.0
+text = "你花了一些时间，仔细观察这里。
+
+远处的轮廓没有变化。你开始留意那些微小的差异。
+
+有些现象只有在特定的时间、特定的地点才会发生。
+
+你记下眼前的状态，准备在之后的探索中再次比较。"
+
+[sub_resource type="Resource" id="ProbeShort"]
+script = ExtResource("3_orxqf")
+location_id = &"surface"
+action_id = "probe"
+duration_seconds = 10.0
+text = "探测完成。
+
+当前地点没有出现新的信号。"
+
+[sub_resource type="Resource" id="ProbeLong"]
+script = ExtResource("3_orxqf")
+location_id = &"surface"
+action_id = "probe"
+long_press = true
+duration_seconds = 30.0
+text = "你延长探测，反复核对信号。
+
+这一次没有发现新的线索。"
+
+[sub_resource type="Resource" id="WaitShort"]
+script = ExtResource("3_orxqf")
+location_id = &"surface"
+action_id = "wait"
+duration_seconds = 10.0
+text = "你在原地等待，时间加速流逝。
+
+关闭文本框以结束等待。"
+
+[sub_resource type="Resource" id="WaitLong"]
+script = ExtResource("3_orxqf")
+location_id = &"surface"
+action_id = "wait"
+long_press = true
+duration_seconds = 60.0
+text = "你在原地等待了一分钟。
+
+时间继续流逝。"
+
+[node name="PlanetExploration" type="Control" unique_id=890816890]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_rdjtn")
+timeline = ExtResource("2_xtue3")
+responses = Array[ExtResource("3_orxqf")]([SubResource("ObserveShort"), SubResource("ObserveLong"), SubResource("ProbeShort"), SubResource("ProbeLong"), SubResource("WaitShort"), SubResource("WaitLong")])
+
+[node name="Background" type="ColorRect" parent="." unique_id=707626790]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="PlanetExplorationUI" parent="." unique_id=1915583244 instance=ExtResource("4_hae5q")]
+layout_mode = 1
+
+[node name="PlanetLabel" parent="PlanetExplorationUI/Header/Content" index="0"]
+layout_mode = 1
+offset_left = 7.0
+offset_top = -6.0
+offset_right = -5.0
+offset_bottom = 6.600006
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ClockLabel" parent="PlanetExplorationUI/Header/Content" index="1"]
+layout_mode = 1
+offset_top = -6.0
+offset_bottom = 6.600006
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LayerLabel" parent="PlanetExplorationUI/Header/Content" index="2"]
+layout_mode = 1
+offset_left = 33.999992
+offset_top = -5.0
+offset_right = -8.0
+offset_bottom = 7.600006
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HoldProgress" parent="PlanetExplorationUI/ActionBar/Buttons/ObserveButton" index="0"]
+visible = true
+layout_mode = 1
+anchors_preset = 12
+offset_left = 3.0
+offset_top = -16.0
+offset_right = -1.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="HoldProgress" parent="PlanetExplorationUI/ActionBar/Buttons/ProbeButton" index="0"]
+visible = true
+layout_mode = 1
+anchors_preset = 12
+offset_left = 3.0
+offset_top = -13.0
+offset_right = -1.0
+offset_bottom = -3.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="HoldProgress" parent="PlanetExplorationUI/ActionBar/Buttons/WaitButton" index="0"]
+visible = true
+layout_mode = 1
+anchors_preset = 12
+offset_left = 3.0
+offset_top = -13.0
+offset_right = -1.0
+offset_bottom = -3.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="TextModal" parent="PlanetExplorationUI" index="2"]
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PauseModal" parent="PlanetExplorationUI" index="3"]
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Shade" parent="PlanetExplorationUI/PauseModal" index="0"]
+grow_horizontal = 2
+grow_vertical = 2
+
+[editable path="PlanetExplorationUI"]

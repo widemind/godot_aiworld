@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cdv4cfdj5j5ms"]
 
-[ext_resource type="Script" uid="uid://ba5vg38d8827e" path="res://scripts/starfield_background.gd" id="1_starfield"]
+[ext_resource type="Script" uid="uid://ba5vg38d8827e" path="res://scripts/effect/starfield_background.gd" id="1_starfield"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_distribution"]
 seed = 137

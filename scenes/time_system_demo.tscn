@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://btvljwiycb4nw"]
 
 [ext_resource type="Script" uid="uid://w1d45o8orulm" path="res://scripts/time/time_system_demo.gd" id="1_demo"]
-[ext_resource type="PackedScene" uid="uid://cdv4cfdj5j5ms" path="res://scenes/starfield_background.tscn" id="2_background"]
+[ext_resource type="PackedScene" uid="uid://cdv4cfdj5j5ms" path="res://scenes/effect/starfield_background.tscn" id="2_background"]
 
 [node name="TimeSystemDemo" type="Control" unique_id=1278654811]
 layout_mode = 3

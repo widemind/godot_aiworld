@@ -1,0 +1,47 @@
+[gd_resource type="Theme" format=3 uid="uid://cawvok3tinuh7"]
+
+[sub_resource type="StyleBoxFlat" id="Style_button"]
+content_margin_left = 36.0
+content_margin_right = 36.0
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="Style_frame"]
+content_margin_left = 22.0
+content_margin_top = 18.0
+content_margin_right = 22.0
+content_margin_bottom = 18.0
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxEmpty" id="Style_progress_background"]
+
+[sub_resource type="StyleBoxFlat" id="Style_progress_fill"]
+bg_color = Color(1, 1, 1, 1)
+
+[resource]
+default_font_size = 26
+Button/colors/font_color = Color(1, 1, 1, 1)
+Button/colors/font_disabled_color = Color(0.55, 0.55, 0.55, 1)
+Button/colors/font_focus_color = Color(1, 1, 1, 1)
+Button/colors/font_hover_color = Color(1, 1, 1, 1)
+Button/colors/font_pressed_color = Color(1, 1, 1, 1)
+Button/styles/disabled = SubResource("Style_button")
+Button/styles/focus = SubResource("Style_button")
+Button/styles/hover = SubResource("Style_button")
+Button/styles/normal = SubResource("Style_button")
+Button/styles/pressed = SubResource("Style_button")
+Label/colors/font_color = Color(1, 1, 1, 1)
+PanelContainer/styles/panel = SubResource("Style_frame")
+ProgressBar/styles/background = SubResource("Style_progress_background")
+ProgressBar/styles/fill = SubResource("Style_progress_fill")
+RichTextLabel/colors/default_color = Color(1, 1, 1, 1)
+RichTextLabel/constants/line_separation = 10

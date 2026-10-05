@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/game_cursor.gd" id="1_cursor"]
+[ext_resource type="Script" uid="uid://bcco2t447v6sd" path="res://scripts/effect/game_cursor.gd" id="1_cursor"]
 
 [node name="GameCursor" type="CanvasLayer"]
 process_mode = 3
