@@ -2,6 +2,7 @@ extends Control
 ## 供开发阶段直接体验时间规则；未来地点场景可复用相同服务。
 
 const TIMELINE: WorldTimeline = preload("res://resources/time/demo_timeline.tres")
+const CURSOR_FRAME_BUTTON: Script = preload("res://scripts/ui/cursor_frame_button.gd")
 
 var _clock_label: Label
 var _state_label: Label
@@ -77,7 +78,7 @@ func _build_interface() -> void:
 	column.add_child(second_row)
 	_add_button(second_row, "穿越通道（80 秒）", _cross_passage)
 	_add_button(second_row, "取消等待", func() -> void: ActionController.cancel_action())
-	var pause_button := Button.new()
+	var pause_button: Button = CURSOR_FRAME_BUTTON.new()
 	pause_button.text = "暂停 / Esc"
 	pause_button.add_theme_font_size_override("font_size", 22)
 	pause_button.pressed.connect(func() -> void: PauseController.set_paused(true))
@@ -103,7 +104,7 @@ func _add_label(parent: Node, content: String, font_size: int) -> Label:
 
 
 func _add_button(parent: Node, content: String, callback: Callable) -> void:
-	var button := Button.new()
+	var button: Button = CURSOR_FRAME_BUTTON.new()
 	button.text = content
 	button.add_theme_font_size_override("font_size", 18)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -123,7 +124,7 @@ func _make_overlay(content: String, button_text: String, callback: Callable) -> 
 	panel.add_child(box)
 	var label := _add_label(box, content, 32)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var button := Button.new()
+	var button: Button = CURSOR_FRAME_BUTTON.new()
 	button.text = button_text
 	button.add_theme_font_size_override("font_size", 26)
 	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER

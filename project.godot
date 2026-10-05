@@ -22,10 +22,13 @@ WorldTime="*uid://bd1vv13liq13h"
 WorldState="*uid://c0qb4hn133dyv"
 ActionController="*uid://2hjtmbmcjhae"
 PauseController="*uid://c6mlute8pgrcc"
+GameCursor="*res://scenes/game_cursor.tscn"
 GlobalCRT="*res://scenes/global_crt.tscn"
 
 [display]
 
+window/size/viewport_width=1920
+window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 

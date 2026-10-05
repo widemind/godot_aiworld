@@ -17,3 +17,7 @@
 - 时间轴演示已接入星空，背景尺寸随演示窗口变化。
 - 配置说明：[全局 CRT](docs/global_crt.md)；[星空背景](docs/starfield_background.md)。
 
+已迁移全局鼠标指针：`GameCursor` 自动加载 `scenes/game_cursor.tscn`，隐藏系统指针，以圆点和四角平滑框选按钮。指针在 CanvasLayer 100 绘制，参与全局 CRT 处理，暂停时继续工作。
+
+时间轴演示的所有按钮已接入。其他按钮可挂载 `scripts/ui/cursor_frame_button.gd`，或加入 `cursor_frame_target` 分组。参数与接入说明见 [游戏内鼠标指针](docs/game_cursor.md)。
+

@@ -12,4 +12,4 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_demo")
 
-[node name="StarfieldBackground" parent="." instance=ExtResource("2_background")]
+[node name="StarfieldBackground" parent="." unique_id=623105282 instance=ExtResource("2_background")]
