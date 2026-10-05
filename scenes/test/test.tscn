@@ -1,32 +1,32 @@
 [gd_scene format=3 uid="uid://04fvturnw8nn"]
 
-[ext_resource type="Script" uid="uid://droa35pmnwljq" path="res://scenes/key.gd" id="1_bl13t"]
-[ext_resource type="Texture2D" uid="uid://b4pm7usgpmrov" path="res://icon.svg" id="1_errlg"]
-[ext_resource type="Script" uid="uid://cky7taeo1jh21" path="res://scenes/test.gd" id="1_iyx0m"]
+[ext_resource type="Script" uid="uid://cky7taeo1jh21" path="res://scenes/test/test.gd" id="1_st4qh"]
+[ext_resource type="Script" uid="uid://droa35pmnwljq" path="res://scenes/test/key.gd" id="2_51e2l"]
+[ext_resource type="Texture2D" uid="uid://b4pm7usgpmrov" path="res://icon.svg" id="3_oj4i3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jq8tk"]
 size = Vector2(129, 128)
 
 [node name="test" type="Node2D" unique_id=2008347141]
-script = ExtResource("1_iyx0m")
+script = ExtResource("1_st4qh")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=255413099]
 
 [node name="key" type="Area2D" parent="." unique_id=2055927547]
-script = ExtResource("1_bl13t")
+script = ExtResource("2_51e2l")
 
 [node name="Sprite2D" type="Sprite2D" parent="key" unique_id=73152915]
-texture = ExtResource("1_errlg")
+texture = ExtResource("3_oj4i3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="key" unique_id=1041061396]
 shape = SubResource("RectangleShape2D_jq8tk")
 
 [node name="key2" type="Area2D" parent="." unique_id=510342128]
 position = Vector2(276, 45)
-script = ExtResource("1_bl13t")
+script = ExtResource("2_51e2l")
 
 [node name="Sprite2D" type="Sprite2D" parent="key2" unique_id=503726131]
-texture = ExtResource("1_errlg")
+texture = ExtResource("3_oj4i3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="key2" unique_id=1665392913]
 shape = SubResource("RectangleShape2D_jq8tk")
