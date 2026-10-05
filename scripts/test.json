@@ -1,0 +1,26 @@
+{
+	"key1":{
+	"type":"inherit",
+	"front_loading":{"time":"","key_front_loading":[],"lock_front_loading":[]},
+	"activate_status":"inactive",
+	"create_status":"create",
+	"lock":"",
+	"keyname":"key1"
+	},
+	"key2":{
+	"type":"inherit",
+	"front_loading":{"time":"","key_front_loading":[],"lock_front_loading":[]},
+	"activate_status":"inactive",
+	"create_status":"create",
+	"lock":"",
+	"keyname":"key2"
+	},
+	"key3":{
+	"type":"inherit",
+	"front_loading":{"time":"","key_front_loading":["key1","key2"],"lock_front_loading":[]},
+	"activate_status":"inactive",
+	"create_status":"not_create",
+	"lock":"",
+	"keyname":"key3"
+	}
+}
