@@ -1,0 +1,115 @@
+[gd_scene format=3 uid="uid://dwobv1b13qyc6"]
+
+[ext_resource type="Script" uid="uid://c1qxxog6avfwi" path="res://scripts/ui/information_list.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cawvok3tinuh7" path="res://resources/ui/planet_exploration_theme.tres" id="2_theme"]
+[ext_resource type="Script" uid="uid://b0ey6v160yc3g" path="res://scripts/effect/cursor_frame_button.gd" id="3_cursor"]
+
+[sub_resource type="StyleBoxFlat" id="Style_body"]
+content_margin_left = 40.0
+content_margin_top = 36.0
+content_margin_right = 32.0
+content_margin_bottom = 24.0
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 1)
+
+[node name="InformationList" type="Control" unique_id=1683688440]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1350824273]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Frame" type="VBoxContainer" parent="." unique_id=1911088774]
+layout_mode = 0
+anchor_left = 0.04
+anchor_top = 0.065
+anchor_right = 0.965
+anchor_bottom = 0.955
+theme_override_constants/separation = -3
+
+[node name="Header" type="PanelContainer" parent="Frame" unique_id=953583677]
+layout_mode = 2
+
+[node name="Content" type="HBoxContainer" parent="Frame/Header" unique_id=1171147127]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="InformationLocation" type="Label" parent="Frame/Header/Content" unique_id=1334245427]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "水星"
+
+[node name="InformationClock" type="Label" parent="Frame/Header/Content" unique_id=2047083747]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "00:00"
+horizontal_alignment = 1
+
+[node name="InformationLayer" type="Label" parent="Frame/Header/Content" unique_id=1856493647]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "上层"
+horizontal_alignment = 2
+
+[node name="Body" type="PanelContainer" parent="Frame" unique_id=550115748]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("Style_body")
+
+[node name="Column" type="VBoxContainer" parent="Frame/Body" unique_id=436143139]
+layout_mode = 2
+theme_override_constants/separation = 22
+
+[node name="InformationScroll" type="ScrollContainer" parent="Frame/Body/Column" unique_id=934002538]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="InformationEntries" type="VBoxContainer" parent="Frame/Body/Column/InformationScroll" unique_id=700047904]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 24
+
+[node name="EmptyInformation" type="Label" parent="Frame/Body/Column/InformationScroll/InformationEntries" unique_id=1423420936]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.65, 0.65, 1)
+text = "尚未获取文本信息。"
+autowrap_mode = 3
+
+[node name="InformationBack" type="Button" parent="Frame/Body/Column" unique_id=1258776904]
+unique_name_in_owner = true
+process_mode = 4
+visible = false
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "返回暂停菜单 / Esc"
+script = ExtResource("3_cursor")
+
+[connection signal="pressed" from="Frame/Body/Column/InformationBack" to="." method="close"]

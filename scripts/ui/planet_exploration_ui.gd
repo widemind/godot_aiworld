@@ -2,6 +2,9 @@ class_name PlanetExplorationUI
 extends Control
 ## 可直接叠加到地图上。地图的 _input 节点须放在此 UI 之前。
 
+const InformationPage = preload("res://scripts/ui/information_list.gd")
+const GuidePage = preload("res://scripts/ui/guide_ui.gd")
+
 signal action_requested(action_id: StringName, long_press: bool)
 signal text_closed
 ## 由上层场景接入对应页面；按钮自身保持世界暂停。
@@ -18,6 +21,8 @@ signal main_menu_requested
 @onready var text_modal: Control = %TextModal
 @onready var narrative: RichTextLabel = %Narrative
 @onready var pause_modal: Control = %PauseModal
+@onready var information_list: InformationPage = %InformationList
+@onready var guide: GuidePage = %GuideUI
 @onready var buttons: Array[ExplorationActionButton] = [%ObserveButton, %ProbeButton, %WaitButton]
 
 var _actions_available: bool = true
@@ -39,11 +44,31 @@ func _on_resume_pressed() -> void:
 
 
 func _on_information_list_pressed() -> void:
+	if not get_tree().paused:
+		return
+	pause_modal.hide()
+	information_list.open(planet_label.text, clock_label.text, layer_label.text, WorldState.get_collected_information())
 	information_list_requested.emit()
 
 
+func _on_information_list_closed() -> void:
+	pause_modal.visible = get_tree().paused
+	if get_tree().paused:
+		%InformationListButton.grab_focus()
+
+
 func _on_guide_pressed() -> void:
+	if not get_tree().paused:
+		return
+	pause_modal.hide()
+	guide.open(planet_label.text, clock_label.text, layer_label.text)
 	guide_requested.emit()
+
+
+func _on_guide_closed() -> void:
+	pause_modal.visible = get_tree().paused
+	if get_tree().paused:
+		%GuideButton.grab_focus()
 
 
 func _on_main_menu_pressed() -> void:
@@ -86,15 +111,31 @@ func is_text_open() -> bool:
 
 
 func _input(event: InputEvent) -> void:
-	# Esc 始终留给现有 PauseController；暂停菜单在文本框之上。
-	if event is InputEventKey and (event.keycode == KEY_ESCAPE or event.physical_keycode == KEY_ESCAPE):
-		return
-	if event is InputEventAction and event.action == &"pause_game":
+	if information_list.visible or guide.visible:
+		var page: Variant = guide if guide.visible else information_list
+		# 子页的 Esc 只返回菜单，不能交给 PauseController 解除暂停。
+		if event.is_action("pause_game"):
+			get_viewport().set_input_as_handled()
+			if event.is_pressed() and not event.is_echo():
+				_dismissal_event = event
+				page.close()
+			return
+		# 指针/触摸交给 ScrollContainer 和返回按钮；其余输入不穿透地图。
+		if not event is InputEventMouse and not event is InputEventScreenTouch and not event is InputEventScreenDrag:
+			get_viewport().set_input_as_handled()
+			if event.is_action_pressed("ui_accept") and not event.is_echo():
+				_dismissal_event = event
+				page.close()
 		return
 	if _dismissal_event != null and event.is_match(_dismissal_event):
 		get_viewport().set_input_as_handled()
 		if not event.is_pressed():
 			_dismissal_event = null
+		return
+	# Esc 始终留给现有 PauseController；暂停菜单在文本框之上。
+	if event is InputEventKey and (event.keycode == KEY_ESCAPE or event.physical_keycode == KEY_ESCAPE):
+		return
+	if event is InputEventAction and event.action == &"pause_game":
 		return
 	if get_tree().paused or not is_text_open():
 		return
@@ -124,7 +165,10 @@ func _on_time_changed(_previous: float, current: float) -> void:
 
 
 func _on_pause_changed(paused: bool) -> void:
-	pause_modal.visible = paused
+	if not paused:
+		information_list.close()
+		guide.close()
+	pause_modal.visible = paused and not information_list.visible and not guide.visible
 	if paused:
 		for button in buttons:
 			button.cancel_hold()

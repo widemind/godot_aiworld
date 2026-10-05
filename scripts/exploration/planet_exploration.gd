@@ -36,7 +36,12 @@ func _exit_tree() -> void:
 
 
 func _refresh_location() -> void:
-	ui.set_location(String(WorldState.get_flag(&"planet_name", "水星")), String(WorldState.get_flag(&"planet_layer", "上层")))
+	var in_space := bool(WorldState.get_flag(&"in_space", false)) or WorldState.player_location == &"space"
+	var planet_name := String(WorldState.get_flag(&"planet_name", ""))
+	if in_space or planet_name.strip_edges().is_empty() or planet_name == "太空":
+		ui.set_location("太空", "")
+	else:
+		ui.set_location(planet_name, String(WorldState.get_flag(&"planet_layer", "")))
 
 
 func _refresh_actions() -> void:
@@ -70,6 +75,7 @@ func _start_waiting(response: ExplorationResponse) -> void:
 	if not WorldTime.set_flow_rate(short_wait_flow_rate):
 		return
 	_waiting = true
+	WorldState.record_information(response.text)
 	ui.show_text(response.text)
 	_refresh_actions()
 
@@ -98,6 +104,7 @@ func _on_action_finished(action: WorldAction, succeeded: bool, _reason: StringNa
 		var response := _pending_response
 		_pending_response = null
 		if succeeded and not response.text.is_empty():
+			WorldState.record_information(response.text)
 			ui.show_text(response.text)
 	_refresh_actions()
 

@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://bqwxitxeqb31g" path="res://scripts/ui/exploration_action_button.gd" id="2_button"]
 [ext_resource type="Script" uid="uid://b0ey6v160yc3g" path="res://scripts/effect/cursor_frame_button.gd" id="3_cursor"]
 [ext_resource type="Theme" uid="uid://cawvok3tinuh7" path="res://resources/ui/planet_exploration_theme.tres" id="4_theme"]
+[ext_resource type="PackedScene" path="res://scenes/ui/information/information_list.tscn" id="5_information"]
 
 [node name="PlanetExplorationUI" type="Control"]
 process_mode = 3
@@ -236,6 +237,11 @@ custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 text = "返回主菜单"
 
+[node name="InformationList" parent="." instance=ExtResource("5_information")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[connection signal="closed" from="InformationList" to="." method="_on_information_list_closed"]
 [connection signal="action_requested" from="ActionBar/Buttons/ObserveButton" to="." method="_on_action_requested"]
 [connection signal="button_down" from="ActionBar/Buttons/ObserveButton" to="ActionBar/Buttons/ObserveButton" method="_begin_hold"]
 [connection signal="button_up" from="ActionBar/Buttons/ObserveButton" to="ActionBar/Buttons/ObserveButton" method="_end_hold"]

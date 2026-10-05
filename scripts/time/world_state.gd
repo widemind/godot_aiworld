@@ -7,6 +7,7 @@ signal knowledge_changed
 var player_location: StringName = &"harbor"
 var _flags: Dictionary = {}
 var _knowledge: Dictionary = {}
+var _collected_information: Array[String] = []
 var _initial_flags: Dictionary = {}
 var _initial_location: StringName = &"harbor"
 
@@ -72,6 +73,21 @@ func record_knowledge(knowledge_id: StringName) -> bool:
 
 func knows(knowledge_id: StringName) -> bool:
 	return _knowledge.has(knowledge_id)
+
+
+func record_information(content: String) -> bool:
+	# 获取顺序跨轮连续；回溯只重置世界状态，不清除已经读到的文本。
+	if not WorldTime.can_advance() or content.strip_edges().is_empty():
+		return false
+	_collected_information.append(content)
+	return true
+
+
+func get_collected_information() -> Array[String]:
+	# 返回副本，页面按从晚到早的顺序展示，不暴露可修改的内部数组。
+	var newest_first: Array[String] = _collected_information.duplicate()
+	newest_first.reverse()
+	return newest_first
 
 
 func _on_event_reached(event: WorldTimeEvent) -> void:

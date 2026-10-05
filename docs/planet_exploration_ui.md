@@ -30,7 +30,7 @@
 
 所有探索 UI 控件、长按进度、主题、节点组和按钮信号连接都保存在场景或资源中。脚本只处理世界状态、输入与控件显示/数值，不创建控件、不重写布局，也不绘制按钮进度。
 
-暂停菜单的四个按钮位于 `PauseModal/Panel/Column`：继续、信息列表、指南、返回主菜单。均为场景中的 Button 节点，高度 60，间距由 Column 的 Separation 调整。后三个按钮分别发出 `information_list_requested`、`guide_requested`、`main_menu_requested` 信号，供上层场景接入对应页面；当前项目尚无这些页面，按钮不会自行解除暂停或切换场景。
+暂停菜单的四个按钮位于 `PauseModal/Panel/Column`：继续、信息列表、指南、返回主菜单。均为场景中的 Button 节点，高度 60，间距由 Column 的 Separation 调整。信息列表已接入内置子页，返回或 Esc 回到暂停菜单并保持暂停，详见 [信息列表](information_list.md)。后三个按钮仍分别发出 `information_list_requested`、`guide_requested`、`main_menu_requested` 信号；指南和返回主菜单尚待上层场景接入。
 
 ## 接入地图与地点内容
 

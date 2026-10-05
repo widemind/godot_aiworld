@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[node name="InformationCard" type="PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+
+[node name="Text" type="RichTextLabel" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+bbcode_enabled = false
+fit_content = true
+scroll_active = false
+autowrap_mode = 3
+text = "已获取的文本信息。\n文本框会根据实际行数自动调整高度。"

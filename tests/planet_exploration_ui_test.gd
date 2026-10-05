@@ -17,7 +17,7 @@ var _map: MapSpy
 func _ready() -> void:
 	_map = MapSpy.new()
 	add_child(_map)
-	_screen = preload("res://scenes/planet_exploration.tscn").instantiate()
+	_screen = preload("res://scenes/ui/exploration/planet_exploration.tscn").instantiate()
 	add_child(_screen)
 	_ui = _screen.get_node("PlanetExplorationUI")
 	_ui.action_requested.connect(func(id: StringName, held: bool) -> void: _requests.append({"id": id, "held": held}))
@@ -80,12 +80,14 @@ func _ready() -> void:
 	_check(not _ui.is_text_open(), "仅匹配地点与操作的规则出现文本")
 	WorldState.apply_changes({&"planet_name": "测试星球", &"planet_layer": "下层"}, &"surface")
 	_check(_ui.planet_label.text == "测试星球" and _ui.layer_label.text == "下层", "地点与层级随世界状态刷新")
+	await _test_information_list()
 	# 循环结束时替换普通文本，关闭后正确重置。
+	var loop_before := WorldTime.loop_index
 	WorldTime.advance_time(WorldTime.get_remaining_seconds())
 	_check(_ui.is_text_open() and WorldTime.phase == WorldTime.Phase.ENDED, "循环终点展示回溯文本")
 	await _send(_key(KEY_ENTER, true))
 	await _send(_key(KEY_ENTER, false))
-	_check(WorldTime.phase == WorldTime.Phase.RUNNING and WorldTime.loop_index == 2, "关闭回溯文本开始下一轮")
+	_check(WorldTime.phase == WorldTime.Phase.RUNNING and WorldTime.loop_index == loop_before + 1, "关闭回溯文本开始下一轮")
 	await _test_short_wait()
 	print("PLANET_EXPLORATION_UI_TEST: %s" % ("PASS" if _failures == 0 else "FAIL (%d)" % _failures))
 	get_tree().quit(0 if _failures == 0 else 1)
@@ -149,6 +151,87 @@ func _test_short_wait() -> void:
 	PauseController.set_paused(false)
 	_check(WorldTime.flow_rate == 3.0, "暂停期间卸载等待场景不遗留加速")
 	WorldTime.set_flow_rate(1.0)
+	WorldTime.set_process(true)
+
+
+func _test_information_list() -> void:
+	WorldTime.set_process(false)
+	var count_before := WorldState.get_collected_information().size()
+	await _click(_ui.buttons[0].get_global_rect().get_center(), 0.02)
+	_check(WorldState.get_collected_information().size() == count_before + 1, "探索成功反馈自动加入信息列表")
+	_ui.close_text()
+	var short_text := "最近获得的短文本。"
+	var long_text := "较早获得的长文本会根据宽度自动换行。".repeat(30) + "\n\n保留段落。\n\n".repeat(35)
+	_check(WorldState.record_information(long_text), "可记录长文本")
+	_check(WorldState.record_information(short_text), "可记录短文本")
+	_check(not WorldState.record_information("  \n"), "不记录空文本")
+	# 原阅读框在子页关闭后仍保留原位置。
+	_ui.show_text("保留的阅读文本。\n\n".repeat(40))
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_ui.narrative.get_v_scroll_bar().value = 80
+	var reading_position := _ui.narrative.get_v_scroll_bar().value
+	var clock := _ui.clock_label.text
+	var time_before := WorldTime.elapsed_seconds
+	PauseController.set_paused(true)
+	await _click(_ui.get_node("%InformationListButton").get_global_rect().get_center(), 0.02)
+	var page := _ui.information_list
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_check(page.visible and not _ui.pause_modal.visible and get_tree().paused, "暂停菜单按钮进入列表并保持暂停")
+	_check(page.location_label.text == "测试星球" and page.clock_label.text == clock, "列表标题是打开时的地点与世界时间")
+	_check(page.layer_label.text == "下层", "星球层级保留在顶部")
+	var first := page.entries.get_child(1) as PanelContainer
+	var second := page.entries.get_child(2) as PanelContainer
+	_check(first.get_node("Text").text == short_text and second.get_node("Text").text == long_text, "文本按获取顺序从晚到早排列")
+	_check(second.size.y > first.size.y and first.size.y < 150, "文本框按行数增高，短文本没有固定的大块空白")
+	_check(first.get_child_count() == 1, "条目仅展示正文，没有时间地点")
+	_check(not page.scroll.get_v_scroll_bar().visible and not page.scroll.get_h_scroll_bar().visible, "两个滚动条均隐藏")
+	var original_scale_size := get_window().content_scale_size
+	var original_height := second.size.y
+	get_window().content_scale_size = Vector2i(960, 540)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_check(second.size.y > original_height, "窄窗口中正文重新换行并增加文本框高度")
+	_check(first.size.x <= page.scroll.size.x and page.back_button.get_global_rect().end.x <= page.get_global_rect().end.x, "窄窗口条目和返回按钮不横向溢出")
+	get_window().content_scale_size = original_scale_size
+	await get_tree().process_frame
+	await get_tree().process_frame
+	await _send(_mouse(MOUSE_BUTTON_WHEEL_DOWN, true, page.scroll.get_global_rect().get_center()))
+	_check(page.scroll.scroll_vertical > 0 and page.visible, "暂停时可滚动长信息列表")
+	WorldTime._process(1.0)
+	_check(WorldTime.elapsed_seconds == time_before, "信息列表内世界时间冻结")
+	await _send(_key(KEY_ESCAPE, true))
+	await _send(_key(KEY_ESCAPE, false))
+	_check(not page.visible and _ui.pause_modal.visible and get_tree().paused, "Esc 返回暂停菜单，不解除暂停")
+	_check(_ui.is_text_open() and _ui.narrative.get_v_scroll_bar().value == reading_position, "返回保留原阅读位置")
+	_ui._on_information_list_pressed()
+	await get_tree().process_frame
+	_check(page.scroll.scroll_vertical == 0, "重开列表从最新文本开始")
+	await _click(page.back_button.get_global_rect().get_center(), 0.02)
+	_check(not page.visible and get_tree().paused, "返回按钮回到暂停菜单")
+	PauseController.set_paused(false)
+	_ui.close_text()
+	WorldState.apply_changes({&"in_space": true}, &"space")
+	PauseController.set_paused(true)
+	_ui._on_information_list_pressed()
+	_check(page.location_label.text == "太空" and page.layer_label.text.is_empty(), "太空显示太空，不显示旧星球及层级")
+	# 页面标题不被后续 UI 更新改写。
+	_ui.set_location("其他星球", "一层")
+	_check(page.location_label.text == "太空", "地点标题保持打开时的快照")
+	PauseController.set_paused(false)
+	_check(not page.visible and not _ui.pause_modal.visible, "外部解除暂停会关闭子页")
+	var no_texts: Array[String] = []
+	page.open("太空", "00:00", "", no_texts)
+	_check(page.empty_label.visible and page.entries.get_child_count() == 1, "空列表显示尚未获取提示，并清理旧条目")
+	page.close()
+	WorldState.apply_changes({&"in_space": false, &"planet_name": "水星", &"planet_layer": "上层"}, &"surface")
+	var count := WorldState.get_collected_information().size()
+	WorldTime.advance_time(WorldTime.get_remaining_seconds())
+	_check(WorldState.get_collected_information().size() == count, "回溯提示不作为获取信息记录")
+	_ui.close_text()
+	await get_tree().process_frame
+	_check(WorldState.get_collected_information().size() == count, "信息记录跨世界循环保留")
 	WorldTime.set_process(true)
 
 

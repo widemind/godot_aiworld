@@ -1,0 +1,97 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/guide_ui.gd" id="1_script"]
+[ext_resource type="Theme" path="res://resources/ui/planet_exploration_theme.tres" id="2_theme"]
+
+[sub_resource type="StyleBoxFlat" id="Style_body"]
+content_margin_left = 40.0
+content_margin_top = 48.0
+content_margin_right = 40.0
+content_margin_bottom = 36.0
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 1)
+
+[node name="GuideUI" type="Control"]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Frame" type="VBoxContainer" parent="."]
+layout_mode = 0
+anchor_left = 0.04
+anchor_top = 0.065
+anchor_right = 0.965
+anchor_bottom = 0.955
+theme_override_constants/separation = -3
+
+[node name="Header" type="PanelContainer" parent="Frame"]
+layout_mode = 2
+
+[node name="Content" type="HBoxContainer" parent="Frame/Header"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="GuideLocation" type="Label" parent="Frame/Header/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "水星"
+
+[node name="GuideClock" type="Label" parent="Frame/Header/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "00:00"
+horizontal_alignment = 1
+
+[node name="GuideLayer" type="Label" parent="Frame/Header/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "上层"
+horizontal_alignment = 2
+
+[node name="Body" type="PanelContainer" parent="Frame"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("Style_body")
+
+[node name="GuideScroll" type="ScrollContainer" parent="Frame/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="GuideText" type="Label" parent="Frame/Body/GuideScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/line_spacing = 10
+text = "指南文本"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[editable path="Frame/Body/GuideScroll/GuideText"]
