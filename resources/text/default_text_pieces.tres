@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="TextPieces" format=3 uid="uid://cscd6idxawfj"]
+
+[ext_resource type="Script" uid="uid://dhbu5e4ayb4kq" path="res://scripts/text/text_pieces.gd" id="1_cyggt"]
+
+[resource]
+script = ExtResource("1_cyggt")
+text = "什么都没发生。"
+metadata/_custom_type_script = "uid://dhbu5e4ayb4kq"
