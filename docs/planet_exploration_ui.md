@@ -38,6 +38,8 @@
 
 业务连接 `action_requested(action_id: StringName, long_press: bool)`，三个 ID 为 `observe`、`probe`、`wait`。调用 `ui.show_text(content)` 展示文本；`text_closed` 通知关闭；`set_actions_available()` 控制行动可用性。`set_location(planet_name, layer_name)` 可单独更新标题，时间自动监听 WorldTime。
 
+接入 TextSelector 时可调用 `ui.show_text_piece(selector.text_selection(action))`，展示 TextPieces 正文并依据 `in_information_list` 加入 TextDatabase。信息列表直接读取 `TextDatabase.get_record_texts()`；相同正文去重，只保留首次获取的顺序。`show_text()` 仍适用于不收集的纯文本提示。
+
 现有入口脚本读取 WorldState 标记 `planet_name`、`planet_layer`，并使用 `player_location` 匹配内容。地点移动仍使用既有 WorldAction / WorldState，不要另建时钟。`responses` 数组中的 ExplorationResponse 资源可配置地点 ID、操作、长短按、世界标记条件、文本和额外耗时；按数组顺序选择首个匹配规则，未匹配不展示文本。结果在 ActionController 成功完成后展示，触及循环终点则展示回溯文本。
 
 主场景的水星/上层、surface 地点、六条响应、10 分钟循环和操作耗时均为界面演示配置，不代表已确定的剧情或关卡规则。替换 `timeline` 与 `responses` 即可接入正式内容。原时间演示场景保留。

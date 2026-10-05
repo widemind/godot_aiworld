@@ -23,6 +23,7 @@ func _ready() -> void:
 	_ui.action_requested.connect(func(id: StringName, held: bool) -> void: _requests.append({"id": id, "held": held}))
 	await get_tree().process_frame
 	await get_tree().process_frame
+	_test_text_database()
 	var a := _ui.buttons[0].get_global_rect()
 	var b := _ui.buttons[1].get_global_rect()
 	var c := _ui.buttons[2].get_global_rect()
@@ -159,7 +160,8 @@ func _test_information_list() -> void:
 	WorldTime.set_process(false)
 	var count_before := WorldState.get_collected_information().size()
 	await _click(_ui.buttons[0].get_global_rect().get_center(), 0.02)
-	_check(WorldState.get_collected_information().size() == count_before + 1, "探索成功反馈自动加入信息列表")
+	_check(TextDatabase.get_record_texts().has(_ui.narrative.text), "探索成功反馈通过兼容接口加入 TextDatabase")
+	_check(WorldState.get_collected_information().size() == count_before, "再次获取相同探索文本不会重复收集")
 	_ui.close_text()
 	var short_text := "最近获得的短文本。"
 	var long_text := "较早获得的长文本会根据宽度自动换行。".repeat(30) + "\n\n保留段落。\n\n".repeat(35)
@@ -238,6 +240,41 @@ func _test_information_list() -> void:
 	await get_tree().process_frame
 	_check(WorldState.get_collected_information().size() == count, "信息记录跨世界循环保留")
 	WorldTime.set_process(true)
+
+
+func _test_text_database() -> void:
+	var first := TextPieces.new()
+	first.text = "数据库第一条文本。"
+	first.in_information_list = true
+	var second := TextPieces.new()
+	second.text = "数据库第二条文本。"
+	second.in_information_list = true
+	var ignored := TextPieces.new()
+	ignored.text = "只展示，不收集的提示。"
+	var collection_time := WorldTime.elapsed_seconds
+	TextDatabase.collect_text(null)
+	TextDatabase.collect_text(first)
+	_check(TextDatabase.get_record_texts() == [first.text], "只有一条记录时也返回第一条文本")
+	TextDatabase.collect_text(second)
+	TextDatabase.collect_text(first.duplicate(true))
+	TextDatabase.collect_text(ignored)
+	var blank := TextPieces.new()
+	blank.in_information_list = true
+	blank.text = " \n"
+	TextDatabase.collect_text(blank)
+	_check(TextDatabase.get_record_texts() == [second.text, first.text], "数据库倒序完整返回，副本去重，提示与空文本不收集")
+	_check(first.text_collection_id == 1 and second.text_collection_id == 2 \
+		and first.text_collected_cycle_num == WorldTime.loop_index \
+		and first.text_collected_time == collection_time, "收集顺序及首次获取的循环时间正确")
+	_ui.show_text_piece(ignored)
+	_check(_ui.narrative.text == ignored.text and TextDatabase.text_collection_list.size() == 2, "TextPieces 可显示而不加入信息列表")
+	_ui.close_text()
+	_ui.show_text_piece(second)
+	_check(_ui.narrative.text == second.text and TextDatabase.text_collection_list.size() == 2, "已收集的 TextPieces 展示时不会重复记录")
+	_ui.close_text()
+	var copy := TextDatabase.get_record_texts()
+	copy.clear()
+	_check(TextDatabase.get_record_texts().size() == 2, "返回数组不暴露数据库内部记录")
 
 
 func _test_guide() -> void:

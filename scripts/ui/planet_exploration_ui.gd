@@ -47,7 +47,7 @@ func _on_information_list_pressed() -> void:
 	if not get_tree().paused:
 		return
 	pause_modal.hide()
-	information_list.open(planet_label.text, clock_label.text, layer_label.text, WorldState.get_collected_information())
+	information_list.open(planet_label.text, clock_label.text, layer_label.text, TextDatabase.get_record_texts())
 	information_list_requested.emit()
 
 
@@ -83,6 +83,14 @@ func set_location(planet_name: String, layer_name: String) -> void:
 func set_actions_available(available: bool) -> void:
 	_actions_available = available
 	_refresh_buttons()
+
+
+func show_text_piece(piece: TextPieces) -> void:
+	# 新文本系统的入口；选择器已收集的文本再次传入也会正确去重。
+	if piece == null:
+		return
+	TextDatabase.collect_text(piece)
+	show_text(piece.text)
 
 
 func show_text(content: String) -> void:

@@ -4,9 +4,11 @@
 
 顶部显示打开页面时的世界时间、当前星球及层级。`WorldState` 的 `in_space = true`、`player_location = &"space"` 或空 `planet_name` 表示太空，标题显示「太空」并隐藏星球层级。标题是打开时的快照。
 
-信息条目仅显示获取的文本，按获取顺序从晚到早排列。相同文本再次获取也会产生一条记录。顺序跨世界循环连续，不依赖每轮归零的时钟。记录存放在 WorldState 中，场景切换和循环重置时保留；当前没有退出游戏后的磁盘存档。
+信息条目仅显示获取的文本，直接读取 `TextDatabase.get_record_texts()`，按获取顺序从晚到早排列。相同正文再次获取会去重，保留首次获取的顺序。记录存放在 TextDatabase 中，顺序跨世界循环连续，场景切换和循环重置时保留；当前没有退出游戏后的磁盘存档。
 
-探索入口在成功展示观察、探测和等待反馈时调用 `WorldState.record_information(content)`；失败、空文本及循环回溯提示不会加入。其他地图或剧情系统可以在确实获取文本后调用同一接口，再调用 `ui.show_text(content)` 显示正文。`show_text()` 本身只负责展示，避免临时提示被自动收集。`WorldState.get_collected_information()` 返回倒序文本副本。
+新文本系统的片段可通过 `ui.show_text_piece(piece: TextPieces)` 展示；它调用 `TextDatabase.collect_text(piece)`，仅收集 `in_information_list = true` 的非空正文。若片段已经由 TextSelector 收集，再次展示也不会产生重复记录。只有正文呈现需求时，仍可用 `ui.show_text(content)`，此接口不会收集。
+
+原探索入口的 `WorldState.record_information(content)` 保留兼容，内部将字符串转为可收集的 TextPieces 并交给 TextDatabase；`WorldState.get_collected_information()` 同样转接到数据库，不再维护独立记录。失败、空文本及循环回溯提示不会加入。
 
 页面复用探索界面的 Theme、全局 CRT 和鼠标框选。列表由 ScrollContainer 和 VBoxContainer 组成，纵向可以滚动但不显示滚动条；横向不滚动，正文自动换行。每个条目为 PanelContainer + RichTextLabel，启用 Fit Content，按行数增长。
 

@@ -2,7 +2,7 @@ extends Control
 ## 供开发阶段直接体验时间规则；未来地点场景可复用相同服务。
 
 const TIMELINE: WorldTimeline = preload("res://resources/time/demo_timeline.tres")
-const CURSOR_FRAME_BUTTON: Script = preload("res://scripts/ui/cursor_frame_button.gd")
+const CURSOR_FRAME_BUTTON: Script = preload("res://scripts/effect/cursor_frame_button.gd")
 
 var _clock_label: Label
 var _state_label: Label
