@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dwobv1b13qyc6"]
 
 [ext_resource type="Script" uid="uid://c1qxxog6avfwi" path="res://scripts/ui/information_list.gd" id="1_script"]
-[ext_resource type="Theme" uid="uid://cawvok3tinuh7" path="res://resources/ui/planet_exploration_theme.tres" id="2_theme"]
+[ext_resource type="Theme" uid="uid://cawvok3tinuh7" path="res://resources/ui/theme.tres" id="2_theme"]
 [ext_resource type="Script" uid="uid://b0ey6v160yc3g" path="res://scripts/effect/cursor_frame_button.gd" id="3_cursor"]
 
 [sub_resource type="StyleBoxFlat" id="Style_body"]

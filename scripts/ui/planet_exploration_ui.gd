@@ -6,6 +6,7 @@ const InformationPage = preload("res://scripts/ui/information_list.gd")
 const GuidePage = preload("res://scripts/ui/guide_ui.gd")
 
 signal action_requested(action_id: StringName, long_press: bool)
+## 每关闭一条文本均发出；若有排队文本，此时下一条已显示。
 signal text_closed
 ## 由上层场景接入对应页面；按钮自身保持世界暂停。
 signal information_list_requested
@@ -13,7 +14,10 @@ signal guide_requested
 signal main_menu_requested
 
 @export_range(10, 200, 1) var wheel_scroll_pixels: int = 72
+## 可在检查器设置默认值，或由关卡调用 set_header_visible()。
+@export var header_visible: bool = true
 
+@onready var header: Control = $Header
 @onready var planet_label: Label = %PlanetLabel
 @onready var clock_label: Label = %ClockLabel
 @onready var layer_label: Label = %LayerLabel
@@ -27,13 +31,16 @@ signal main_menu_requested
 
 var _actions_available: bool = true
 var _dismissal_event: InputEvent
+var _text_queue: Array[String] = []
 
 
 func _ready() -> void:
 	# 编辑器里可以临时显示弹窗排版；运行时从正常探索界面开始。
 	text_modal.hide()
 	action_bar.show()
+	header.visible = header_visible
 	WorldTime.time_changed.connect(_on_time_changed)
+	WorldTime.timeline_started.connect(_on_timeline_started)
 	PauseController.pause_changed.connect(_on_pause_changed)
 	_on_time_changed(0.0, WorldTime.elapsed_seconds)
 	_on_pause_changed(get_tree().paused)
@@ -75,9 +82,20 @@ func _on_main_menu_pressed() -> void:
 	main_menu_requested.emit()
 
 
+func _on_timeline_started(_world: int, _loop_index: int) -> void:
+	_on_time_changed(0.0, WorldTime.elapsed_seconds)
+
+
 func set_location(planet_name: String, layer_name: String) -> void:
 	planet_label.text = planet_name
 	layer_label.text = layer_name
+
+
+func set_header_visible(value: bool) -> void:
+	# 隐藏顶部整栏（地点、层级、轮次和时间）；后台数据仍持续更新。
+	header_visible = value
+	if is_instance_valid(header):
+		header.visible = value
 
 
 func set_actions_available(available: bool) -> void:
@@ -94,6 +112,13 @@ func show_text_piece(piece: TextPieces) -> void:
 
 
 func show_text(content: String) -> void:
+	if is_text_open():
+		_text_queue.append(content)
+		return
+	_display_text(content)
+
+
+func _display_text(content: String) -> void:
 	for button in buttons:
 		button.cancel_hold()
 	narrative.text = content
@@ -108,10 +133,19 @@ func show_text(content: String) -> void:
 func close_text() -> void:
 	if not text_modal.visible:
 		return
-	text_modal.hide()
-	action_bar.show()
-	_refresh_buttons()
+	if not _text_queue.is_empty():
+		_display_text(_text_queue.pop_front())
+	else:
+		text_modal.hide()
+		action_bar.show()
+		_refresh_buttons()
 	text_closed.emit()
+
+
+func clear_texts() -> void:
+	# 新循环/场景主动清理时丢弃待显示的旧文本。
+	_text_queue.clear()
+	close_text()
 
 
 func is_text_open() -> bool:
@@ -169,7 +203,7 @@ func _on_action_requested(action_id: StringName, long_press: bool) -> void:
 
 func _on_time_changed(_previous: float, current: float) -> void:
 	var seconds := int(current)
-	clock_label.text = "%02d:%02d" % [seconds / 60, seconds % 60]
+	clock_label.text = "第 %d 轮 · %02d:%02d" % [WorldTime.loop_index, seconds / 60, seconds % 60]
 
 
 func _on_pause_changed(paused: bool) -> void:

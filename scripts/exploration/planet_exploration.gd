@@ -2,6 +2,7 @@ extends Control
 ## UI 入口及示例规则。正式地图可通过 WorldState 写入位置和星球/层级标记。
 
 @export var timeline: WorldTimeline
+@export var real_timeline: WorldTimeline
 @export var responses: Array[ExplorationResponse] = []
 ## 短按等待时的世界时间倍率，持续到等待文本关闭。
 @export_range(1.0, 100.0, 0.5) var short_wait_flow_rate: float = 10.0
@@ -10,6 +11,7 @@ extends Control
 
 var _pending_response: ExplorationResponse
 var _reset_pending: bool = false
+var _retry_pending: bool = false
 var _waiting: bool = false
 var _previous_wait_rate: float = 1.0
 
@@ -18,17 +20,23 @@ func _ready() -> void:
 	ui.action_requested.connect(_on_action_requested)
 	ui.text_closed.connect(_on_text_closed)
 	WorldState.state_changed.connect(_refresh_location)
-	WorldTime.loop_started.connect(_on_loop_started)
+	WorldTime.timeline_started.connect(_on_timeline_started)
+	WorldTime.timeline_stopped.connect(_stop_waiting)
 	WorldTime.loop_ended.connect(_on_loop_ended)
+	WorldJourney.game_failed.connect(_on_game_failed)
+	PauseController.pause_changed.connect(_on_pause_changed)
 	ActionController.action_started.connect(_on_action_started)
 	ActionController.action_finished.connect(_on_action_finished)
-	if WorldTime.phase == WorldTime.Phase.READY and timeline != null:
-		if timeline.install():
-			WorldTime.start_loop()
+	if not WorldJourney.is_started() and WorldTime.phase == WorldTime.Phase.READY:
+		if not WorldJourney.start(timeline, real_timeline):
+			push_error("探索入口需要有效的虚拟世界与现实世界时间表。")
 	_refresh_location()
 	_refresh_actions()
 	if WorldTime.phase in [WorldTime.Phase.ENDED, WorldTime.Phase.RESETTING]:
-		_on_loop_ended(WorldTime.loop_index)
+		if WorldTime.world == WorldTime.World.VIRTUAL:
+			_on_loop_ended(WorldTime.loop_index)
+		elif WorldJourney.failed:
+			_on_game_failed()
 
 
 func _exit_tree() -> void:
@@ -69,7 +77,7 @@ func _on_action_requested(action_id: StringName, long_press: bool) -> void:
 
 
 func _start_waiting(response: ExplorationResponse) -> void:
-	if _waiting or response.text.is_empty():
+	if _waiting or ui.is_text_open() or response.text.is_empty():
 		return
 	_previous_wait_rate = WorldTime.flow_rate
 	if not WorldTime.set_flow_rate(short_wait_flow_rate):
@@ -109,10 +117,11 @@ func _on_action_finished(action: WorldAction, succeeded: bool, _reason: StringNa
 	_refresh_actions()
 
 
-func _on_loop_started(_loop_index: int) -> void:
+func _on_timeline_started(_world: int, _loop_index: int) -> void:
 	_waiting = false
 	_reset_pending = false
-	ui.close_text()
+	_retry_pending = false
+	ui.clear_texts()
 	_refresh_location()
 	_refresh_actions()
 
@@ -124,14 +133,40 @@ func _on_loop_ended(_loop_index: int) -> void:
 	_refresh_actions()
 
 
+func _on_game_failed() -> void:
+	_stop_waiting()
+	_reset_pending = false
+	_retry_pending = true
+	ui.show_text("现实世界时间已耗尽，游戏失败。\n已完成进度和已获取信息已保留。\n按任意键或点击，返回虚拟世界最后一轮，从零重新计时。")
+	_refresh_actions()
+
+
 func _on_text_closed() -> void:
 	_stop_waiting()
-	if _reset_pending:
+	# 回溯提示同样排队，必须读完当前及队列中的文本才能开始下一轮。
+	if _reset_pending and not ui.is_text_open():
 		_restart_loop.call_deferred()
+	elif _retry_pending and not ui.is_text_open():
+		_retry_virtual.call_deferred()
+
+
+func _retry_virtual() -> void:
+	if _retry_pending and not get_tree().paused and not ui.is_text_open():
+		WorldJourney.return_to_virtual()
+
+
+func _on_pause_changed(paused: bool) -> void:
+	# 暂停期间脚本关闭提示时，恢复后继续尚未完成的回溯/重试。
+	if not paused and not ui.is_text_open():
+		if _retry_pending:
+			_retry_virtual.call_deferred()
+		elif _reset_pending:
+			_restart_loop.call_deferred()
 
 
 func _restart_loop() -> void:
-	if get_tree().paused:
+	if not _reset_pending or WorldTime.world != WorldTime.World.VIRTUAL \
+			or get_tree().paused or ui.is_text_open():
 		return
 	if WorldTime.phase == WorldTime.Phase.ENDED:
 		WorldTime.begin_reset()

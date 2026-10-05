@@ -4,6 +4,8 @@
 [ext_resource type="Resource" path="res://resources/exploration/preview_timeline.tres" id="2_xtue3"]
 [ext_resource type="Script" uid="uid://b26nl7b1jjfv6" path="res://scripts/exploration/exploration_response.gd" id="3_orxqf"]
 [ext_resource type="PackedScene" path="res://scenes/ui/exploration/planet_exploration_ui.tscn" id="4_hae5q"]
+[ext_resource type="Resource" path="res://resources/time/real_timeline.tres" id="5_real"]
+[ext_resource type="PackedScene" uid="uid://cdv4cfdj5j5ms" path="res://scenes/effect/starfield_background.tscn" id="6_orxqf"]
 
 [sub_resource type="Resource" id="ObserveShort"]
 script = ExtResource("3_orxqf")
@@ -73,17 +75,10 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_rdjtn")
 timeline = ExtResource("2_xtue3")
+real_timeline = ExtResource("5_real")
 responses = Array[ExtResource("3_orxqf")]([SubResource("ObserveShort"), SubResource("ObserveLong"), SubResource("ProbeShort"), SubResource("ProbeLong"), SubResource("WaitShort"), SubResource("WaitLong")])
 
-[node name="Background" type="ColorRect" parent="." unique_id=707626790]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(0, 0, 0, 1)
+[node name="StarfieldBackground" parent="." unique_id=105787829 instance=ExtResource("6_orxqf")]
 
 [node name="PlanetExplorationUI" parent="." unique_id=1915583244 instance=ExtResource("4_hae5q")]
 layout_mode = 1
@@ -159,3 +154,4 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [editable path="PlanetExplorationUI"]
+[editable path="PlanetExplorationUI/GuideUI"]

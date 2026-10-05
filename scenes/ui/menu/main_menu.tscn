@@ -1,0 +1,99 @@
+[gd_scene format=3 uid="uid://ccp5b22kq0ert"]
+
+[ext_resource type="Theme" uid="uid://cawvok3tinuh7" path="res://resources/ui/theme.tres" id="1_5ssjm"]
+[ext_resource type="FontFile" uid="uid://pff3dw40ujj4" path="res://resources/ui/aaquanxiheiti.ttf" id="2_eip10"]
+[ext_resource type="PackedScene" uid="uid://cdv4cfdj5j5ms" path="res://scenes/effect/starfield_background.tscn" id="3_eip10"]
+
+[sub_resource type="FontVariation" id="FontVariation_3rkot"]
+base_font = ExtResource("2_eip10")
+spacing_glyph = 100
+
+[sub_resource type="FontVariation" id="FontVariation_cdovg"]
+base_font = ExtResource("2_eip10")
+spacing_glyph = 62
+
+[sub_resource type="FontVariation" id="FontVariation_hnvam"]
+base_font = ExtResource("2_eip10")
+spacing_glyph = 5
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_eip10"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_araup"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_boguu"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8dn53"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pm6bo"]
+
+[node name="MainMenu" type="Control" unique_id=809085546]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_5ssjm")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="." unique_id=594275234]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -614.5
+offset_top = -340.0
+offset_right = 720.5
+offset_bottom = 90.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/normal_font = SubResource("FontVariation_3rkot")
+theme_override_font_sizes/normal_font_size = 250
+bbcode_enabled = true
+text = "[color=orange]炽[/color][color=white]阳之[/color][color=red]心[/color]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="." unique_id=131403625]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -467.5
+offset_top = 23.0
+offset_right = 467.5
+offset_bottom = 59.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = SubResource("FontVariation_cdovg")
+theme_override_font_sizes/font_size = 35
+text = "BLAZING HEART"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="." unique_id=1516563719 groups=["cursor_frame_target"]]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -264.5
+offset_top = 223.0
+offset_right = 264.5
+offset_bottom = 265.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = SubResource("FontVariation_hnvam")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxEmpty_eip10")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_araup")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_boguu")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_8dn53")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_pm6bo")
+text = "Press any key to continue..."
+
+[node name="StarfieldBackground" parent="." unique_id=105787829 instance=ExtResource("3_eip10")]

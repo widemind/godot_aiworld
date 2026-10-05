@@ -3,8 +3,8 @@
 [ext_resource type="Script" uid="uid://pb21l88l4tp5" path="res://scripts/ui/planet_exploration_ui.gd" id="1_ui"]
 [ext_resource type="Script" uid="uid://bqwxitxeqb31g" path="res://scripts/ui/exploration_action_button.gd" id="2_button"]
 [ext_resource type="Script" uid="uid://b0ey6v160yc3g" path="res://scripts/effect/cursor_frame_button.gd" id="3_cursor"]
-[ext_resource type="Theme" uid="uid://cawvok3tinuh7" path="res://resources/ui/planet_exploration_theme.tres" id="4_theme"]
-[ext_resource type="PackedScene" path="res://scenes/ui/information/information_list.tscn" id="5_information"]
+[ext_resource type="Theme" uid="uid://cawvok3tinuh7" path="res://resources/ui/theme.tres" id="4_theme"]
+[ext_resource type="PackedScene" uid="uid://dwobv1b13qyc6" path="res://scenes/ui/information/information_list.tscn" id="5_information"]
 [ext_resource type="PackedScene" path="res://scenes/ui/guide/guide_ui.tscn" id="6_guide"]
 
 [node name="PlanetExplorationUI" type="Control"]
@@ -49,7 +49,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-text = "00:00"
+text = "第 1 轮 · 00:00"
 horizontal_alignment = 1
 vertical_alignment = 1
 
