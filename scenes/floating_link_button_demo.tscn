@@ -1,0 +1,118 @@
+[gd_scene format=3 uid="uid://d366c4exival8"]
+
+[ext_resource type="Script" uid="uid://b81rnpoguffnr" path="res://scripts/ui/floating_link_button_demo.gd" id="1_demo"]
+[ext_resource type="PackedScene" uid="uid://dwx4x55q1vrjv" path="res://scenes/ui/floating_link_button.tscn" id="2_button"]
+[ext_resource type="Theme" uid="uid://cawvok3tinuh7" path="res://resources/ui/theme.tres" id="3_theme"]
+[ext_resource type="Script" uid="uid://b0ey6v160yc3g" path="res://scripts/effect/cursor_frame_button.gd" id="4_cursor"]
+
+[node name="FloatingLinkButtonDemo" type="Control" unique_id=588897011]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("3_theme")
+script = ExtResource("1_demo")
+
+[node name="World" type="Node2D" parent="." unique_id=646709618]
+
+[node name="Target" type="Node2D" parent="World" unique_id=1617840241]
+position = Vector2(1300, 540)
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=144924172]
+layer = 10
+
+[node name="Controls" type="Control" parent="UI" unique_id=1641703540]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("3_theme")
+
+[node name="Heading" type="Label" parent="UI/Controls" unique_id=1688771540]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 92.0
+offset_right = 1000.0
+offset_bottom = 165.0
+theme_override_font_sizes/font_size = 52
+text = "浮动关联按钮"
+
+[node name="Description" type="Label" parent="UI/Controls" unique_id=406317626]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 182.0
+offset_right = 1600.0
+offset_bottom = 264.0
+theme_override_colors/font_color = Color(0.66, 0.75, 0.86, 1)
+text = "按钮在摆放位置附近轻微漂浮，虚线跟随可移动的目标。
+拖拽右侧圆点可自由移动；下方按钮可以切换自动移动和色调。"
+
+[node name="CyanButton" parent="UI/Controls" unique_id=432768004 node_paths=PackedStringArray("target") instance=ExtResource("2_button")]
+custom_minimum_size = Vector2(100, 64)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.18
+anchor_top = 0.38
+anchor_right = 0.18
+anchor_bottom = 0.38
+offset_right = 128.4
+offset_bottom = 72.0
+text = "观察目标"
+target = NodePath("../../../World/Target")
+target_gap = 44.0
+
+[node name="OrangeButton" parent="UI/Controls" unique_id=1591040276 node_paths=PackedStringArray("target") instance=ExtResource("2_button")]
+custom_minimum_size = Vector2(100, 64)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.24
+anchor_top = 0.64
+anchor_right = 0.24
+anchor_bottom = 0.64
+offset_right = 138.20001
+offset_bottom = 72.0
+text = "目标信息"
+button_tint = Color(1, 0.68, 0.35, 1)
+float_phase = 2.2
+target = NodePath("../../../World/Target")
+line_color = Color(1, 0.68, 0.35, 0.8)
+target_gap = 44.0
+
+[node name="AutoMove" type="Button" parent="UI/Controls" unique_id=846245321]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 916.0
+offset_right = 380.0
+offset_bottom = 988.0
+text = "自动移动 / 停止"
+script = ExtResource("4_cursor")
+
+[node name="Palette" type="Button" parent="UI/Controls" unique_id=1206681868]
+layout_mode = 0
+offset_left = 410.0
+offset_top = 916.0
+offset_right = 670.0
+offset_bottom = 988.0
+text = "切换色调"
+script = ExtResource("4_cursor")
+
+[node name="Status" type="Label" parent="UI/Controls" unique_id=196977475]
+layout_mode = 0
+offset_left = 740.0
+offset_top = 934.0
+offset_right = 1850.0
+offset_bottom = 982.0
+theme_override_colors/font_color = Color(0.66, 0.75, 0.86, 1)
+theme_override_font_sizes/font_size = 24
+text = "点击浮动按钮，验证它们仍然可以正常交互"
+
+[connection signal="pressed" from="UI/Controls/CyanButton" to="." method="_on_cyan_pressed"]
+[connection signal="pressed" from="UI/Controls/OrangeButton" to="." method="_on_orange_pressed"]
+[connection signal="pressed" from="UI/Controls/AutoMove" to="." method="_on_auto_pressed"]
+[connection signal="pressed" from="UI/Controls/Palette" to="." method="_on_palette_pressed"]

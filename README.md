@@ -1,5 +1,7 @@
 # godot_aiworld
 
+可复用浮动关联按钮：`scenes/ui/floating_link_button.tscn`。绑定可移动的 Node2D / Control，按钮在摆放位置附近漂浮，虚线实时连接目标，按钮和虚线颜色独立可调。演示：`scenes/floating_link_button_demo.tscn`（F6）；接入说明：[浮动关联按钮](docs/floating_link_button.md)。
+
 全局像素溶解场景过渡已接入 `SceneTransition` Autoload。调用 `SceneTransition.change_scene_to_file(target_path)`，旧画面按方块溶解后直接露出新场景；保留全局光标和单次 CRT 处理。演示：打开 `scenes/scene_transition_demo_a.tscn` 按 F6。参数与接口见 [场景过渡](docs/scene_transition.md)。
 
 已迁移 `E:\GDWork\021-food-statement` 的世界时间轴系统。

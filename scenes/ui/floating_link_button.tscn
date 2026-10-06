@@ -1,0 +1,76 @@
+[gd_scene format=3 uid="uid://dwx4x55q1vrjv"]
+
+[ext_resource type="Script" uid="uid://bcg2plkfseano" path="res://scripts/ui/floating_link_button.gd" id="1_button"]
+[ext_resource type="Theme" uid="uid://cawvok3tinuh7" path="res://resources/ui/theme.tres" id="2_theme"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dh3xu"]
+content_margin_left = 10.0
+content_margin_top = 12.0
+content_margin_right = 10.0
+content_margin_bottom = 12.0
+bg_color = Color(0.025, 0.055, 0.09, 0.95)
+border_color = Color(0.45, 0.85, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n2q2g"]
+content_margin_left = 10.0
+content_margin_top = 12.0
+content_margin_right = 10.0
+content_margin_bottom = 12.0
+bg_color = Color(0.11, 0.21400002, 0.272, 0.96)
+border_color = Color(0.45, 0.85, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vh2le"]
+content_margin_left = 10.0
+content_margin_top = 12.0
+content_margin_right = 10.0
+content_margin_bottom = 12.0
+bg_color = Color(0.025, 0.055, 0.09, 0.95)
+border_color = Color(0.615, 0.89500004, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qm4k7"]
+content_margin_left = 10.0
+content_margin_top = 12.0
+content_margin_right = 10.0
+content_margin_bottom = 12.0
+bg_color = Color(0.025, 0.055, 0.09, 0.95)
+border_color = Color(0.45, 0.85, 1, 0.4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qb7yf"]
+content_margin_left = 10.0
+content_margin_top = 12.0
+content_margin_right = 10.0
+content_margin_bottom = 12.0
+bg_color = Color(0.025, 0.055, 0.09, 0.95)
+draw_center = false
+border_color = Color(0.615, 0.89500004, 1, 1)
+
+[node name="FloatingLinkButton" type="Control" unique_id=219328288]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 124.0
+offset_bottom = 64.0
+mouse_filter = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_button")
+float_amplitude = Vector2(12, 8)
+float_speed = 1.6
+
+[node name="Button" type="Button" parent="." unique_id=257220675]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.45, 0.85, 1, 1)
+theme_override_colors/font_focus_color = Color(0.615, 0.89500004, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.45, 0.85, 1, 1)
+theme_override_colors/font_hover_color = Color(0.615, 0.89500004, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.85, 1, 0.4)
+theme_override_styles/normal = SubResource("StyleBoxFlat_dh3xu")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_n2q2g")
+theme_override_styles/hover = SubResource("StyleBoxFlat_vh2le")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_qm4k7")
+theme_override_styles/focus = SubResource("StyleBoxFlat_qb7yf")
+text = "关联按钮"
