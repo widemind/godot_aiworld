@@ -30,7 +30,8 @@ var discard_basic_text_selection:bool = false
 ## 特殊选择器，实现自定义文本选择。
 @warning_ignore("unused_parameter")
 func special_text_selection(action:StringName) -> TextPieces:
-	return TextDatabase.default_text_pieces
+	# 返回 null 才会继续使用基本选择器；最终未匹配时统一使用默认文本。
+	return null
 
 ## 默认选择器，依据操作选择对应的列表，并按优先级选择文本。
 ## 可以覆写特殊选择器以改变选择方式。
@@ -65,30 +66,9 @@ func text_selection(action:StringName) -> TextPieces:
 
 ## 列表内文本筛选器，按优先级选择文本
 func list_text_selection(list:Array[TextPieces]) -> TextPieces:
-	var text_pieces:TextPieces = null
-	if len(list) == 0:
-		push_error("Empty TextPieces List")
-	else:
-		var selected_pieces:TextPieces = null
-		for pieces in list:
-			if pieces == null:
-				continue
-			if pieces.time_requirements < WorldTime.elapsed_seconds:
-				continue
-			elif len(pieces.text_requirements.keys()) == 0:
-				selected_pieces = pieces
-				break
-			else:
-				var requirements_passed = true
-				for requirement in pieces.text_requirements.keys():
-					if pieces.text_requirements[requirement] != WorldState.get_flag(requirement):
-						requirements_passed = false
-						break
-				if requirements_passed:
-					selected_pieces = pieces
-					break
-		if selected_pieces:
-			text_pieces = selected_pieces
-		else:
-			text_pieces = null
-	return text_pieces
+	for pieces in list:
+		if pieces == null or WorldTime.elapsed_seconds < pieces.time_requirements:
+			continue
+		if WorldState.meets_conditions(pieces.text_requirements):
+			return pieces
+	return null

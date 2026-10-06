@@ -56,6 +56,6 @@
 - 短按等待打开文本并持续加速时间（默认 10 倍），关闭文本后恢复原倍率；入口节点的 `short_wait_flow_rate` 可调整倍率。
 - 文本支持滚轮阅读、关闭输入不穿透、阅读时继续计时；Esc 暂停后保留阅读位置。
 - 复用既有时间系统、全局指针和 CRT。中央地图区域与源项目一致，保留黑色占位。
-- `resources/exploration/preview_timeline.tres` 与入口的 `responses` 是演示配置。暂停菜单已接入 [信息列表](docs/information_list.md) 和 [指南](docs/guide_ui.md)；指南教程在 `GuideText` 节点的 Text 属性中填写。“返回主菜单”发出信号供后续接入。
+- `resources/exploration/preview_timeline.tres` 与入口的 `text_selectors`、`action_durations_seconds` 是演示配置。暂停菜单已接入 [信息列表](docs/information_list.md) 和 [指南](docs/guide_ui.md)；指南教程在 `GuideText` 节点的 Text 属性中填写。“返回主菜单”发出信号供后续接入。
 - 配置说明：[星球探索 UI](docs/planet_exploration_ui.md)。行为测试：`Godot --headless --path . res://tests/planet_exploration_ui_test.tscn`。
 

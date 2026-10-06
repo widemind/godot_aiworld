@@ -8,7 +8,7 @@
 
 新文本系统的片段可通过 `ui.show_text_piece(piece: TextPieces)` 展示；它调用 `TextDatabase.collect_text(piece)`，仅收集 `in_information_list = true` 的非空正文。若片段已经由 TextSelector 收集，再次展示也不会产生重复记录。只有正文呈现需求时，仍可用 `ui.show_text(content)`，此接口不会收集。
 
-原探索入口的 `WorldState.record_information(content)` 保留兼容，内部将字符串转为可收集的 TextPieces 并交给 TextDatabase；`WorldState.get_collected_information()` 同样转接到数据库，不再维护独立记录。失败、空文本及循环回溯提示不会加入。
+探索入口通过 TextSelector 选择 TextPieces，再交给 `show_text_piece()` 展示。旧字符串接口 `WorldState.record_information(content)` 保留兼容，内部将字符串转为可收集的 TextPieces 并交给 TextDatabase；`WorldState.get_collected_information()` 同样转接到数据库，不再维护独立记录。失败、空文本及循环回溯提示不会加入。
 
 页面复用探索界面的 Theme、全局 CRT 和鼠标框选。列表由 ScrollContainer 和 VBoxContainer 组成，纵向可以滚动但不显示滚动条；横向不滚动，正文自动换行。每个条目为 PanelContainer + RichTextLabel，启用 Fit Content，按行数增长。
 

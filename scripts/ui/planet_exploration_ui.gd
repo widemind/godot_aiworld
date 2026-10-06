@@ -12,6 +12,7 @@ signal text_closed
 signal information_list_requested
 signal guide_requested
 signal main_menu_requested
+signal wait_until_loop_end_requested
 
 @export_range(10, 200, 1) var wheel_scroll_pixels: int = 72
 ## 可在检查器设置默认值，或由关卡调用 set_header_visible()。
@@ -24,6 +25,12 @@ signal main_menu_requested
 @onready var action_bar: PanelContainer = %ActionBar
 @onready var text_modal: Control = %TextModal
 @onready var narrative: RichTextLabel = %Narrative
+@onready var exploration_narrative: RichTextLabel = %Narrative
+@onready var exploration_text_panel: Control = $TextModal/TextPanel
+@onready var loop_end_shade: ColorRect = %LoopEndShade
+@onready var loop_end_panel: Control = %LoopEndPanel
+@onready var loop_end_narrative: RichTextLabel = %LoopEndNarrative
+@onready var wait_until_loop_end_button: ExplorationActionButton = %WaitUntilLoopEndButton
 @onready var pause_modal: Control = %PauseModal
 @onready var information_list: InformationPage = %InformationList
 @onready var guide: GuidePage = %GuideUI
@@ -31,12 +38,15 @@ signal main_menu_requested
 
 var _actions_available: bool = true
 var _dismissal_event: InputEvent
-var _text_queue: Array[String] = []
+var _text_queue: Array[Dictionary] = []
+var _wait_until_loop_end_available: bool = false
 
 
 func _ready() -> void:
 	# 编辑器里可以临时显示弹窗排版；运行时从正常探索界面开始。
 	text_modal.hide()
+	loop_end_shade.hide()
+	loop_end_panel.hide()
 	action_bar.show()
 	header.visible = header_visible
 	WorldTime.time_changed.connect(_on_time_changed)
@@ -48,6 +58,13 @@ func _ready() -> void:
 
 func _on_resume_pressed() -> void:
 	PauseController.set_paused(false)
+
+
+func _on_wait_until_loop_end_action_requested(_action_id: StringName, long_press: bool) -> void:
+	if not long_press or not get_tree().paused or wait_until_loop_end_button.disabled:
+		return
+	get_viewport().set_input_as_handled()
+	wait_until_loop_end_requested.emit()
 
 
 func _on_information_list_pressed() -> void:
@@ -103,6 +120,11 @@ func set_actions_available(available: bool) -> void:
 	_refresh_buttons()
 
 
+func set_wait_until_loop_end_available(available: bool) -> void:
+	_wait_until_loop_end_available = available
+	_refresh_buttons()
+
+
 func show_text_piece(piece: TextPieces) -> void:
 	# 新文本系统的入口；选择器已收集的文本再次传入也会正确去重。
 	if piece == null:
@@ -112,20 +134,40 @@ func show_text_piece(piece: TextPieces) -> void:
 
 
 func show_text(content: String) -> void:
-	if is_text_open():
-		_text_queue.append(content)
-		return
-	_display_text(content)
+	_queue_text(content, false)
 
 
-func _display_text(content: String) -> void:
+## 与探索文本共用段落队列和输入处理，使用居中面板与背景遮罩。
+func show_loop_end_text(content: String) -> void:
+	_queue_text(content, true)
+
+
+func _queue_text(content: String, loop_end: bool) -> void:
+	# 只拆分显示副本；TextDatabase 中的完整原文及换行保持不变。
+	var normalized := content.replace("\r\n", "\n").replace("\r", "\n")
+	for paragraph in normalized.split("\n", false):
+		if paragraph.strip_edges().is_empty():
+			continue
+		if is_text_open():
+			_text_queue.append({"text": paragraph, "loop_end": loop_end})
+		else:
+			_display_text(paragraph, loop_end)
+
+
+func _display_text(content: String, loop_end: bool = false) -> void:
 	for button in buttons:
 		button.cancel_hold()
+	wait_until_loop_end_button.cancel_hold()
+	exploration_text_panel.visible = not loop_end
+	loop_end_shade.visible = loop_end
+	loop_end_panel.visible = loop_end
+	narrative = loop_end_narrative if loop_end else exploration_narrative
 	narrative.text = content
 	narrative.get_v_scroll_bar().value = 0.0
 	text_modal.show()
 	# 让文本框的底色覆盖按钮；隐藏按钮也避免焦点与指针继续命中。
-	action_bar.hide()
+	# 结束页面下方保留变暗的 UI；普通探索文本仍覆盖并隐藏行动按钮。
+	action_bar.visible = loop_end
 	get_viewport().gui_release_focus()
 	_refresh_buttons()
 
@@ -134,7 +176,8 @@ func close_text() -> void:
 	if not text_modal.visible:
 		return
 	if not _text_queue.is_empty():
-		_display_text(_text_queue.pop_front())
+		var next: Dictionary = _text_queue.pop_front()
+		_display_text(next.text, next.loop_end)
 	else:
 		text_modal.hide()
 		action_bar.show()
@@ -150,6 +193,10 @@ func clear_texts() -> void:
 
 func is_text_open() -> bool:
 	return text_modal.visible
+
+
+func is_loop_end_text_open() -> bool:
+	return is_text_open() and loop_end_panel.visible
 
 
 func _input(event: InputEvent) -> void:
@@ -207,6 +254,7 @@ func _on_time_changed(_previous: float, current: float) -> void:
 
 
 func _on_pause_changed(paused: bool) -> void:
+	wait_until_loop_end_button.cancel_hold()
 	if not paused:
 		information_list.close()
 		guide.close()
@@ -220,3 +268,5 @@ func _on_pause_changed(paused: bool) -> void:
 func _refresh_buttons() -> void:
 	for button in buttons:
 		button.disabled = not _actions_available or is_text_open() or get_tree().paused
+	%WaitUntilLoopEndButton.disabled = not _wait_until_loop_end_available \
+		or WorldTime.world != WorldTime.World.VIRTUAL or WorldTime.phase != WorldTime.Phase.RUNNING
