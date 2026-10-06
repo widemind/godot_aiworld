@@ -1,5 +1,30 @@
 # godot_aiworld
 
+正式入口为 **星图枢纽**：`scenes/map/map.tscn`（`project.godot` 的 `run/main_scene`）。
+
+- **宇宙地图不需要移动**：相机固定、整张图一屏放下。**← →** 换目标，**R** 或「进入 X」前往，
+  选中的行星有高亮圈。
+- **扫描是波形**：`Tab` 发出扩散圆环，波前扫过的行星逐个浮现，右侧结果面板列出每颗行星的
+  距离、可进入层数与已查明线索。
+- **每颗行星是独立地图**：`scenes/planets/*.tscn`，各自有地形、建筑与谜题。
+- **行星内用「上一层 / 下一层」按钮换层**；只有多层的行星才显示这两个按钮
+  （水星 4 层、火星 2 层；地球与太阳单层，按钮隐藏）。不能走时变灰并给出原因
+  （水星 3→4 需要核心露出；火星必须在 1 层洞口旁）。**「返回宇宙地图」按钮**随时回航道。
+- **摩斯电码按钮只在能发送的地方出现**：太阳外层常驻；地球 1 层要先用灯把赤阳之塔框住、
+  再走到塔边，「进入赤阳之塔」会打开塔内发送台。行星地表默认看不到这三个按钮。
+- 房间左上角显示真实行星与层（例如「水星 · 2 层」）。
+- 视野经济：基础视野 → 扫描临时扩大 → 点亮建筑提供固定视野；「交互范围等同于视野范围」。
+- **赤阳之塔在地球 1 层**：只在被观察时移动，靠点亮周围建筑把灯铺到塔身才能进入。
+- 太阳语摩斯电码：短按=点、长按=划、等待键分段；码表与门控见 [太阳语与摩斯电码](docs/sun_language.md)。
+- 10 分钟太阳循环：600s 太阳增亮（观测塔停转）、660s 水星 1 层变换并露出核心、1080s 暴晕。
+- 三个 AI（水星 Mercury / 火星 Mars / 地球 AI）与天文台观测记录按知识分层对话，K 打开知识树。
+- 接入说明：[星图与行星地图](docs/star_map.md)。
+- 其他按键：房间内 WASD 移动、E 交互、Esc 暂停；星球上 Tab 扫描、K 知识地图。
+- 行为测试：`Godot --headless --path . res://test/tests/star_map_scene_test.tscn`、
+  `star_map_test.tscn`、`terrain_dialogue_test.tscn`、`sun_language_test.tscn`。
+
+时间轴演示仍可打开 `scenes/time_system_demo.tscn` 按 F6 独立运行；`scenes/ui/exploration/planet_exploration.tscn` 保留为观察/探测/等待的文本演示。
+
 可复用浮动关联按钮：`scenes/ui/floating_link_button.tscn`。绑定可移动的 Node2D / Control，按钮在摆放位置附近漂浮，虚线实时连接目标，按钮和虚线颜色独立可调。演示：`scenes/floating_link_button_demo.tscn`（F6）；接入说明：[浮动关联按钮](docs/floating_link_button.md)。
 
 全局像素溶解场景过渡已接入 `SceneTransition` Autoload。调用 `SceneTransition.change_scene_to_file(target_path)`，旧画面按方块溶解后直接露出新场景；保留全局光标和单次 CRT 处理。演示：打开 `scenes/scene_transition_demo_a.tscn` 按 F6。参数与接口见 [场景过渡](docs/scene_transition.md)。

@@ -3,30 +3,55 @@
 [ext_resource type="Script" uid="uid://dcsolxjqw7368" path="res://scripts/time/world_time_event.gd" id="1_56b63"]
 [ext_resource type="Script" uid="uid://vgr0qdlp5k0l" path="res://scripts/time/world_timeline.gd" id="2_tyunv"]
 
-[sub_resource type="Resource" id="Resource_6gbaa"]
+[sub_resource type="Resource" id="Resource_sun_brighten"]
 script = ExtResource("1_56b63")
-event_id = &"sunlight_up"
+event_id = &"sun_brighten"
 at_seconds = 600.0
 changes = {
-&"sunlight_up": true
+&"sun_bright": true
 }
 metadata/_custom_type_script = "uid://dcsolxjqw7368"
 
-[sub_resource type="Resource" id="Resource_s2ddq"]
+[sub_resource type="Resource" id="Resource_mercury_boil"]
 script = ExtResource("1_56b63")
-event_id = &"mercury_open"
+event_id = &"mercury_boil"
 at_seconds = 660.0
 changes = {
-&"mercury_open": true
+&"mercury_boiling": true
+}
+metadata/_custom_type_script = "uid://dcsolxjqw7368"
+
+[sub_resource type="Resource" id="Resource_mercury_core"]
+script = ExtResource("1_56b63")
+event_id = &"mercury_core_open"
+at_seconds = 660.0
+priority = 1
+changes = {
+&"mercury_core_open": true
+}
+metadata/_custom_type_script = "uid://dcsolxjqw7368"
+
+[sub_resource type="Resource" id="Resource_sun_flare"]
+script = ExtResource("1_56b63")
+event_id = &"sun_flare"
+at_seconds = 1080.0
+changes = {
+&"sun_flare": true
 }
 metadata/_custom_type_script = "uid://dcsolxjqw7368"
 
 [resource]
 script = ExtResource("2_tyunv")
-loop_duration = 960.0
+loop_duration = 1200.0
+initial_location = &"space"
 initial_flags = {
-&"mercury_open": false,
-&"sunlight_up": false
+&"in_space": true,
+&"mercury_boiling": false,
+&"mercury_core_open": false,
+&"planet_layer": "",
+&"planet_name": "太空",
+&"sun_bright": false,
+&"sun_flare": false
 }
-events = Array[ExtResource("1_56b63")]([SubResource("Resource_6gbaa"), SubResource("Resource_s2ddq")])
+events = Array[ExtResource("1_56b63")]([SubResource("Resource_sun_brighten"), SubResource("Resource_mercury_boil"), SubResource("Resource_mercury_core"), SubResource("Resource_sun_flare")])
 metadata/_custom_type_script = "uid://vgr0qdlp5k0l"

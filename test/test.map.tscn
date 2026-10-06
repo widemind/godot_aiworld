@@ -1,55 +1,21 @@
-[gd_scene format=3 uid="uid://04fvturnw8nn"]
+[gd_scene format=3 uid="uid://dsw3x8k4njisu"]
 
-<<<<<<< Updated upstream
-[ext_resource type="Script" uid="uid://cky7taeo1jh21" path="res://scenes/test/test.gd" id="1_st4qh"]
-[ext_resource type="Script" uid="uid://droa35pmnwljq" path="res://scenes/test/key.gd" id="2_51e2l"]
-[ext_resource type="Texture2D" uid="uid://b4pm7usgpmrov" path="res://icon.svg" id="3_oj4i3"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_jq8tk"]
-size = Vector2(129, 128)
-=======
-[ext_resource type="Script" uid="uid://cqwmqtxha2aut" path="res://test/map.gd" id="1_51e2l"]
-[ext_resource type="Script" uid="uid://cu7fpgcwu82v7" path="res://test/player.gd" id="2_oj4i3"]
-[ext_resource type="Script" uid="uid://cwlmb5qk5gvk4" path="res://test/time_control.gd" id="3_k6n02"]
-[ext_resource type="Texture2D" uid="uid://b4pm7usgpmrov" path="res://icon.svg" id="3_oj4i3"]
->>>>>>> Stashed changes
+[ext_resource type="Script" uid="uid://cf6vlcrnng25m" path="res://test/test.map.gd" id="1_j6sgq"]
+[ext_resource type="Script" uid="uid://ceo7jbn3tlxx8" path="res://test/player.gd" id="2_j6sgq"]
+[ext_resource type="Script" uid="uid://8g5cyederwj7" path="res://test/time_control.gd" id="3_j6sgq"]
+[ext_resource type="Texture2D" uid="uid://b4pm7usgpmrov" path="res://icon.svg" id="4_alu1w"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3xd07"]
 size = Vector2(128, 128)
 
-<<<<<<< Updated upstream
-[node name="Camera2D" type="Camera2D" parent="." unique_id=255413099]
-
-[node name="key" type="Area2D" parent="." unique_id=2055927547]
-script = ExtResource("2_51e2l")
-
-[node name="Sprite2D" type="Sprite2D" parent="key" unique_id=73152915]
-texture = ExtResource("3_oj4i3")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="key" unique_id=1041061396]
-shape = SubResource("RectangleShape2D_jq8tk")
-
-[node name="key2" type="Area2D" parent="." unique_id=510342128]
-position = Vector2(276, 45)
-script = ExtResource("2_51e2l")
-
-[node name="Sprite2D" type="Sprite2D" parent="key2" unique_id=503726131]
-texture = ExtResource("3_oj4i3")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="key2" unique_id=1665392913]
-shape = SubResource("RectangleShape2D_jq8tk")
-
-[connection signal="input_event" from="key" to="key" method="_on_input_event"]
-[connection signal="input_event" from="key2" to="key2" method="_on_input_event"]
-=======
 [sub_resource type="CircleShape2D" id="CircleShape2D_3xd07"]
 radius = 89.44272
 
 [node name="map" type="Node2D" unique_id=1769928172]
-script = ExtResource("1_51e2l")
+script = ExtResource("1_j6sgq")
 
 [node name="player" type="CharacterBody2D" parent="." unique_id=2008074081]
-script = ExtResource("2_oj4i3")
+script = ExtResource("2_j6sgq")
 
 [node name="Camera2D" type="Camera2D" parent="player" unique_id=2000046687]
 
@@ -60,7 +26,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("3_k6n02")
+script = ExtResource("3_j6sgq")
+metadata/_edit_use_anchors_ = true
 
 [node name="time_speed_1x" type="Button" parent="player/Camera2D/time_control" unique_id=436157540]
 layout_mode = 0
@@ -70,6 +37,7 @@ offset_right = 932.0
 offset_bottom = -412.0
 theme_override_font_sizes/font_size = 32
 text = "时间倍率1x"
+metadata/_edit_use_anchors_ = true
 
 [node name="time_speed_2x" type="Button" parent="player/Camera2D/time_control" unique_id=189263684]
 layout_mode = 0
@@ -110,7 +78,7 @@ text = "扫描"
 z_index = -2
 
 [node name="Sprite2D" type="Sprite2D" parent="player" unique_id=1792266499]
-texture = ExtResource("3_oj4i3")
+texture = ExtResource("4_alu1w")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="player" unique_id=837033476]
 shape = SubResource("RectangleShape2D_3xd07")
@@ -189,4 +157,3 @@ shape = SubResource("CircleShape2D_3xd07")
 [connection signal="body_entered" from="planets/water_planet/inter" to="." method="_on_inter_body_entered" binds= ["water_planet"]]
 [connection signal="body_entered" from="planets/fire_planet/inter" to="." method="_on_inter_body_entered" binds= ["fire_planet"]]
 [connection signal="body_entered" from="planets/earth/inter" to="." method="_on_inter_body_entered" binds= ["earth"]]
->>>>>>> Stashed changes

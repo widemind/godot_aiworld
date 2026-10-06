@@ -1,0 +1,206 @@
+[gd_scene format=3 uid="uid://byquj25acrsmt"]
+
+[ext_resource type="Script" uid="uid://beimjyw0vwn5v" path="res://scripts/map/star_map.gd" id="1_map"]
+[ext_resource type="Script" uid="uid://ceo7jbn3tlxx8" path="res://test/player.gd" id="2_player"]
+[ext_resource type="Theme" uid="uid://cawvok3tinuh7" path="res://resources/ui/theme.tres" id="5_theme"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_planet"]
+radius = 110.0
+
+[node name="Map" type="Node2D" unique_id=1107850182]
+script = ExtResource("1_map")
+
+[node name="player" type="CharacterBody2D" parent="." unique_id=1912875079]
+visible = false
+script = ExtResource("2_player")
+
+[node name="Camera2D" type="Camera2D" parent="player" unique_id=1844362216]
+zoom = Vector2(0.7, 0.7)
+
+[node name="planets" type="Node2D" parent="." unique_id=1945790409]
+
+[node name="earth" type="Node2D" parent="planets" unique_id=1852742994 groups=["planet_root"]]
+position = Vector2(1500, 700)
+
+[node name="visual" type="Polygon2D" parent="planets/earth" unique_id=38643139]
+color = Color(0.35, 0.62, 0.95, 1)
+polygon = PackedVector2Array(0, -150, 150, 0, 0, 150, -150, 0)
+
+[node name="label" type="Label" parent="planets/earth" unique_id=695143556]
+offset_left = -80.0
+offset_top = 165.0
+offset_right = 80.0
+offset_bottom = 205.0
+theme_override_font_sizes/font_size = 34
+text = "地球"
+horizontal_alignment = 1
+
+[node name="inter" type="Area2D" parent="planets/earth" unique_id=61129505]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="planets/earth/inter" unique_id=1336961016]
+shape = SubResource("CircleShape2D_planet")
+
+[node name="mercury" type="Node2D" parent="planets" unique_id=2124112737 groups=["planet_root"]]
+position = Vector2(700, 240)
+
+[node name="visual" type="Polygon2D" parent="planets/mercury" unique_id=1976475237]
+color = Color(0.78, 0.76, 0.7, 1)
+polygon = PackedVector2Array(0, -110, 110, 0, 0, 110, -110, 0)
+
+[node name="label" type="Label" parent="planets/mercury" unique_id=280001972]
+offset_left = -80.0
+offset_top = 125.0
+offset_right = 80.0
+offset_bottom = 165.0
+theme_override_font_sizes/font_size = 34
+text = "水星"
+horizontal_alignment = 1
+
+[node name="inter" type="Area2D" parent="planets/mercury" unique_id=1721882228]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="planets/mercury/inter" unique_id=877597727]
+shape = SubResource("CircleShape2D_planet")
+
+[node name="mars" type="Node2D" parent="planets" unique_id=1917972854 groups=["planet_root"]]
+position = Vector2(420, 960)
+
+[node name="visual" type="Polygon2D" parent="planets/mars" unique_id=552897592]
+color = Color(0.85, 0.42, 0.3, 1)
+polygon = PackedVector2Array(0, -120, 120, 0, 0, 120, -120, 0)
+
+[node name="label" type="Label" parent="planets/mars" unique_id=904979096]
+offset_left = -80.0
+offset_top = 135.0
+offset_right = 80.0
+offset_bottom = 175.0
+theme_override_font_sizes/font_size = 34
+text = "火星"
+horizontal_alignment = 1
+
+[node name="inter" type="Area2D" parent="planets/mars" unique_id=1751029144]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="planets/mars/inter" unique_id=445648976]
+shape = SubResource("CircleShape2D_planet")
+
+[node name="sun" type="Node2D" parent="planets" unique_id=1413702069 groups=["planet_root"]]
+position = Vector2(320, 620)
+
+[node name="visual" type="Polygon2D" parent="planets/sun" unique_id=1331024223]
+color = Color(1, 0.78, 0.42, 1)
+polygon = PackedVector2Array(0, -170, 170, 0, 0, 170, -170, 0)
+
+[node name="label" type="Label" parent="planets/sun" unique_id=2079035912]
+offset_left = -80.0
+offset_top = 185.0
+offset_right = 80.0
+offset_bottom = 225.0
+theme_override_font_sizes/font_size = 34
+text = "太阳"
+horizontal_alignment = 1
+
+[node name="inter" type="Area2D" parent="planets/sun" unique_id=1675209763]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="planets/sun/inter" unique_id=2076541576]
+shape = SubResource("CircleShape2D_planet")
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=1305178989]
+
+[node name="Header" type="PanelContainer" parent="UI" unique_id=1392310866]
+offset_left = 24.0
+offset_top = 18.0
+offset_right = 1896.0
+offset_bottom = 90.0
+mouse_filter = 2
+theme = ExtResource("5_theme")
+
+[node name="Content" type="Control" parent="UI/Header" unique_id=478408473]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="PlanetLabel" type="Label" parent="UI/Header/Content" unique_id=1509519466]
+layout_mode = 0
+offset_right = 300.0
+offset_bottom = 40.0
+text = "太空"
+vertical_alignment = 1
+
+[node name="ClockLabel" type="Label" parent="UI/Header/Content" unique_id=1880690191]
+layout_mode = 0
+offset_left = 300.0
+offset_right = 1596.0
+offset_bottom = 40.0
+text = "第 1 轮 · 00:00"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LayerLabel" type="Label" parent="UI/Header/Content" unique_id=1857287816]
+layout_mode = 0
+offset_left = 1596.0
+offset_right = 1848.0
+offset_bottom = 40.0
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="ScanResult" type="Label" parent="UI" unique_id=1828534897]
+offset_left = 1320.0
+offset_top = 120.0
+offset_right = 1880.0
+offset_bottom = 460.0
+theme_override_font_sizes/font_size = 24
+text = "尚未扫描"
+autowrap_mode = 3
+
+[node name="ActionBar" type="PanelContainer" parent="UI" unique_id=888684390]
+offset_left = 24.0
+offset_top = 960.0
+offset_right = 1896.0
+offset_bottom = 1056.0
+theme = ExtResource("5_theme")
+
+[node name="Buttons" type="HBoxContainer" parent="UI/ActionBar" unique_id=1683942165]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ScanButton" type="Button" parent="UI/ActionBar/Buttons" unique_id=318031985 groups=["cursor_frame_target"]]
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "扫描（Tab）"
+
+[node name="PrevButton" type="Button" parent="UI/ActionBar/Buttons" unique_id=852086945 groups=["cursor_frame_target"]]
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "← 上一颗"
+
+[node name="EnterButton" type="Button" parent="UI/ActionBar/Buttons" unique_id=6191936 groups=["cursor_frame_target"]]
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+size_flags_horizontal = 5
+text = "进入 地球（R）"
+
+[node name="NextButton" type="Button" parent="UI/ActionBar/Buttons" unique_id=174279862 groups=["cursor_frame_target"]]
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "下一颗 →"
+
+[node name="KnowledgeButton" type="Button" parent="UI/ActionBar/Buttons" unique_id=1916470586 groups=["cursor_frame_target"]]
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "知识地图（K）"
+
+[node name="StatusLabel" type="Label" parent="UI" unique_id=1322955181]
+offset_left = 32.0
+offset_top = 100.0
+offset_right = 1200.0
+offset_bottom = 136.0
+
+[node name="FeedbackLabel" type="Label" parent="UI" unique_id=1091955997]
+offset_left = 32.0
+offset_top = 852.0
+offset_right = 1400.0
+offset_bottom = 940.0
+theme_override_font_sizes/font_size = 28
+autowrap_mode = 3

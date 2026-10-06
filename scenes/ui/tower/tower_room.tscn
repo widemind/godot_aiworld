@@ -1,0 +1,103 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/tower_room.gd" id="1_tower"]
+[ext_resource type="Theme" uid="uid://cawvok3tinuh7" path="res://resources/ui/theme.tres" id="2_theme"]
+
+[node name="TowerRoom" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_tower")
+
+[node name="Shade" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.04, 0.02, 0.01, 0.93)
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 0
+anchor_left = 0.1
+anchor_top = 0.16
+anchor_right = 0.9
+anchor_bottom = 0.84
+
+[node name="Column" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TowerTitle" type="Label" parent="Panel/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 38
+text = "赤阳之塔 · 内部"
+horizontal_alignment = 1
+
+[node name="TowerStatus" type="Label" parent="Panel/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "已完成 0 / 3 段"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TowerDisplay" type="Label" parent="Panel/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "输入：—"
+horizontal_alignment = 1
+
+[node name="TowerLog" type="Label" parent="Panel/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 24
+autowrap_mode = 3
+text = "塔内的石壁上刻着三段太阳语。把它们按顺序打出来。"
+vertical_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="Panel/Column"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TowerMorseButton" type="Button" parent="Panel/Column/Buttons" groups=["cursor_frame_target"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "电码键：短按=点 长按=划"
+
+[node name="TowerWaitButton" type="Button" parent="Panel/Column/Buttons" groups=["cursor_frame_target"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "等待键：分段"
+
+[node name="TowerSendButton" type="Button" parent="Panel/Column/Buttons" groups=["cursor_frame_target"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "发送"
+
+[node name="TowerClearButton" type="Button" parent="Panel/Column/Buttons" groups=["cursor_frame_target"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "清空"
+
+[node name="TowerLeaveButton" type="Button" parent="Panel/Column" groups=["cursor_frame_target"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+text = "离开赤阳之塔（Esc）"
