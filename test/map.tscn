@@ -1,0 +1,157 @@
+[gd_scene format=3 uid="uid://b3moo3f62ffln"]
+
+[ext_resource type="Script" uid="uid://cqwmqtxha2aut" path="res://test/map.gd" id="1_28w67"]
+[ext_resource type="Script" uid="uid://cu7fpgcwu82v7" path="res://test/player.gd" id="1_u55gp"]
+[ext_resource type="Script" uid="uid://cwlmb5qk5gvk4" path="res://test/time_control.gd" id="2_28w67"]
+[ext_resource type="Texture2D" uid="uid://b4pm7usgpmrov" path="res://icon.svg" id="2_wv8eg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3xd07"]
+size = Vector2(128, 128)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3xd07"]
+radius = 89.44272
+
+[node name="map" type="Node2D" unique_id=1769928172]
+script = ExtResource("1_28w67")
+
+[node name="player" type="CharacterBody2D" parent="." unique_id=2008074081]
+script = ExtResource("1_u55gp")
+
+[node name="Camera2D" type="Camera2D" parent="player" unique_id=2000046687]
+
+[node name="time_control" type="Control" parent="player/Camera2D" unique_id=444924551]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_28w67")
+
+[node name="time_speed_1x" type="Button" parent="player/Camera2D/time_control" unique_id=436157540]
+layout_mode = 0
+offset_left = 632.0
+offset_top = -512.0
+offset_right = 932.0
+offset_bottom = -412.0
+theme_override_font_sizes/font_size = 32
+text = "时间倍率1x"
+
+[node name="time_speed_2x" type="Button" parent="player/Camera2D/time_control" unique_id=189263684]
+layout_mode = 0
+offset_left = 632.0
+offset_top = -360.0
+offset_right = 932.0
+offset_bottom = -260.0
+theme_override_font_sizes/font_size = 32
+text = "时间倍率2x"
+
+[node name="time_speed_5x" type="Button" parent="player/Camera2D/time_control" unique_id=1530047410]
+layout_mode = 0
+offset_left = 632.0
+offset_top = -208.0
+offset_right = 932.0
+offset_bottom = -108.0
+theme_override_font_sizes/font_size = 32
+text = "时间倍率5x"
+
+[node name="Control" type="Control" parent="player/Camera2D" unique_id=69005172]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="scan" type="Button" parent="player/Camera2D/Control" unique_id=274118919]
+layout_mode = 0
+offset_left = -776.0
+offset_top = 344.0
+offset_right = -476.0
+offset_bottom = 444.0
+theme_override_font_sizes/font_size = 32
+text = "扫描"
+
+[node name="ring" type="Polygon2D" parent="player/Camera2D" unique_id=910483634]
+z_index = -2
+
+[node name="Sprite2D" type="Sprite2D" parent="player" unique_id=1792266499]
+texture = ExtResource("2_wv8eg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="player" unique_id=837033476]
+shape = SubResource("RectangleShape2D_3xd07")
+
+[node name="arrow" type="Node2D" parent="player" unique_id=1713890317]
+
+[node name="Polygon2D" type="Polygon2D" parent="player/arrow" unique_id=118872115]
+
+[node name="planets" type="Node2D" parent="." unique_id=1968841506]
+
+[node name="sun" type="Node2D" parent="planets" unique_id=200426793]
+position = Vector2(1232, 304)
+
+[node name="Label" type="Label" parent="planets/sun" unique_id=2056964394]
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_font_sizes/font_size = 32
+text = "太阳"
+
+[node name="inter" type="Area2D" parent="planets/sun" unique_id=983630586]
+position = Vector2(32, 24)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="planets/sun/inter" unique_id=1926041961]
+shape = SubResource("CircleShape2D_3xd07")
+
+[node name="water_planet" type="Node2D" parent="planets" unique_id=1237367170]
+position = Vector2(-320, -424)
+
+[node name="Label" type="Label" parent="planets/water_planet" unique_id=1468504648]
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_font_sizes/font_size = 32
+text = "水星"
+
+[node name="inter" type="Area2D" parent="planets/water_planet" unique_id=1086085904]
+position = Vector2(32, 24)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="planets/water_planet/inter" unique_id=1823545700]
+shape = SubResource("CircleShape2D_3xd07")
+
+[node name="fire_planet" type="Node2D" parent="planets" unique_id=61481971]
+position = Vector2(96, 592)
+
+[node name="Label" type="Label" parent="planets/fire_planet" unique_id=1685365975]
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_font_sizes/font_size = 32
+text = "火星"
+
+[node name="inter" type="Area2D" parent="planets/fire_planet" unique_id=310703395]
+position = Vector2(32, 24)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="planets/fire_planet/inter" unique_id=1533136562]
+shape = SubResource("CircleShape2D_3xd07")
+
+[node name="earth" type="Node2D" parent="planets" unique_id=284379402]
+position = Vector2(-1336, 360)
+
+[node name="Label" type="Label" parent="planets/earth" unique_id=1425734148]
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_font_sizes/font_size = 32
+text = "地球"
+
+[node name="inter" type="Area2D" parent="planets/earth" unique_id=1166202243]
+position = Vector2(32, 24)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="planets/earth/inter" unique_id=1394136111]
+shape = SubResource("CircleShape2D_3xd07")
+
+[connection signal="pressed" from="player/Camera2D/time_control/time_speed_1x" to="player/Camera2D/time_control" method="_on_time_speed_1x_pressed"]
+[connection signal="pressed" from="player/Camera2D/time_control/time_speed_2x" to="player/Camera2D/time_control" method="_on_time_speed_2x_pressed"]
+[connection signal="pressed" from="player/Camera2D/time_control/time_speed_5x" to="player/Camera2D/time_control" method="_on_time_speed_5x_pressed"]
+[connection signal="pressed" from="player/Camera2D/Control/scan" to="." method="_on_scan_pressed"]
+[connection signal="body_entered" from="planets/sun/inter" to="." method="_on_inter_body_entered" binds= ["sun"]]
+[connection signal="body_entered" from="planets/water_planet/inter" to="." method="_on_inter_body_entered" binds= ["water_planet"]]
+[connection signal="body_entered" from="planets/fire_planet/inter" to="." method="_on_inter_body_entered" binds= ["fire_planet"]]
+[connection signal="body_entered" from="planets/earth/inter" to="." method="_on_inter_body_entered" binds= ["earth"]]

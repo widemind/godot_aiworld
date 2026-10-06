@@ -1,0 +1,263 @@
+[gd_scene format=3 uid="uid://iqkso1jk2o5r"]
+
+[ext_resource type="Script" uid="uid://pb21l88l4tp5" path="res://scripts/ui/planet_exploration_ui.gd" id="1_ui"]
+[ext_resource type="Script" uid="uid://bqwxitxeqb31g" path="res://scripts/ui/exploration_action_button.gd" id="2_button"]
+[ext_resource type="Script" uid="uid://b0ey6v160yc3g" path="res://scripts/effect/cursor_frame_button.gd" id="3_cursor"]
+[ext_resource type="Theme" uid="uid://cawvok3tinuh7" path="res://resources/ui/planet_exploration_theme.tres" id="4_theme"]
+[ext_resource type="PackedScene" uid="uid://dwobv1b13qyc6" path="res://scenes/ui/information/information_list.tscn" id="5_information"]
+[ext_resource type="PackedScene" path="res://scenes/ui/guide/guide_ui.tscn" id="6_guide"]
+
+[node name="PlanetExplorationUI" type="Control" unique_id=191176477]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("4_theme")
+script = ExtResource("1_ui")
+
+[node name="Header" type="PanelContainer" parent="." unique_id=1064631704]
+layout_mode = 0
+anchor_left = 0.04
+anchor_top = 0.065
+anchor_right = 0.965
+anchor_bottom = 0.12
+mouse_filter = 2
+
+[node name="Content" type="Control" parent="Header" unique_id=847640599]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="PlanetLabel" type="Label" parent="Header/Content" unique_id=521725401]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+text = "水星"
+vertical_alignment = 1
+
+[node name="ClockLabel" type="Label" parent="Header/Content" unique_id=1441981172]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "00:00"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LayerLabel" type="Label" parent="Header/Content" unique_id=1037988040]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -42.0
+text = "上层"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="ActionBar" type="PanelContainer" parent="." unique_id=392667572]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_left = 0.04
+anchor_top = 0.871
+anchor_right = 0.968
+anchor_bottom = 0.974
+
+[node name="Buttons" type="HBoxContainer" parent="ActionBar" unique_id=1666248013]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ObserveButton" type="Button" parent="ActionBar/Buttons" unique_id=2633100 groups=["cursor_frame_target"]]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "观察"
+alignment = 0
+script = ExtResource("2_button")
+action_id = &"observe"
+
+[node name="HoldProgress" type="ProgressBar" parent="ActionBar/Buttons/ObserveButton" unique_id=22589574]
+visible = false
+layout_mode = 0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = -8.0
+offset_right = -2.0
+offset_bottom = -6.0
+mouse_filter = 2
+show_percentage = false
+
+[node name="ProbeButton" type="Button" parent="ActionBar/Buttons" unique_id=487528737 groups=["cursor_frame_target"]]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "探测"
+alignment = 0
+script = ExtResource("2_button")
+action_id = &"probe"
+
+[node name="HoldProgress" type="ProgressBar" parent="ActionBar/Buttons/ProbeButton" unique_id=837011926]
+visible = false
+layout_mode = 0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = -8.0
+offset_right = -2.0
+offset_bottom = -6.0
+mouse_filter = 2
+show_percentage = false
+
+[node name="WaitButton" type="Button" parent="ActionBar/Buttons" unique_id=1170721581 groups=["cursor_frame_target"]]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "等待"
+alignment = 0
+script = ExtResource("2_button")
+action_id = &"wait"
+
+[node name="HoldProgress" type="ProgressBar" parent="ActionBar/Buttons/WaitButton" unique_id=1397837256]
+visible = false
+layout_mode = 0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = -8.0
+offset_right = -2.0
+offset_bottom = -6.0
+mouse_filter = 2
+show_percentage = false
+
+[node name="TextModal" type="Control" parent="." unique_id=1122549291]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextPanel" type="PanelContainer" parent="TextModal" unique_id=1746514429]
+layout_mode = 0
+anchor_left = 0.038
+anchor_top = 0.735
+anchor_right = 0.968
+anchor_bottom = 0.952
+
+[node name="TextMargin" type="MarginContainer" parent="TextModal/TextPanel" unique_id=1536976671]
+layout_mode = 2
+mouse_filter = 0
+theme_override_constants/margin_left = 56
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 8
+
+[node name="Narrative" type="RichTextLabel" parent="TextModal/TextPanel/TextMargin" unique_id=2105027384]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+text = "展示文本
+
+在此节点调整字号、行距与文本区域；运行时由地点反馈替换正文。"
+scroll_active = false
+
+[node name="PauseModal" type="Control" parent="." unique_id=252331120]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Shade" type="ColorRect" parent="PauseModal" unique_id=828186869]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.8)
+
+[node name="Panel" type="PanelContainer" parent="PauseModal" unique_id=355443352]
+layout_mode = 0
+anchor_left = 0.35
+anchor_top = 0.28
+anchor_right = 0.65
+anchor_bottom = 0.72
+
+[node name="Column" type="VBoxContainer" parent="PauseModal/Panel" unique_id=842441694]
+layout_mode = 2
+theme_override_constants/separation = 28
+alignment = 1
+
+[node name="Title" type="Label" parent="PauseModal/Panel/Column" unique_id=1619335333]
+layout_mode = 2
+text = "世界已暂停"
+horizontal_alignment = 1
+
+[node name="ResumeButton" type="Button" parent="PauseModal/Panel/Column" unique_id=1059956863]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "继续 / Esc"
+script = ExtResource("3_cursor")
+
+[node name="InformationListButton" type="Button" parent="PauseModal/Panel/Column" unique_id=1299152946 groups=["cursor_frame_target"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "信息列表"
+
+[node name="GuideButton" type="Button" parent="PauseModal/Panel/Column" unique_id=179875997 groups=["cursor_frame_target"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "指南"
+
+[node name="MainMenuButton" type="Button" parent="PauseModal/Panel/Column" unique_id=960952550 groups=["cursor_frame_target"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "返回主菜单"
+
+[node name="InformationList" parent="." unique_id=530461154 instance=ExtResource("5_information")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="GuideUI" parent="." unique_id=1749723145 instance=ExtResource("6_guide")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[connection signal="action_requested" from="ActionBar/Buttons/ObserveButton" to="." method="_on_action_requested"]
+[connection signal="button_down" from="ActionBar/Buttons/ObserveButton" to="ActionBar/Buttons/ObserveButton" method="_begin_hold"]
+[connection signal="button_up" from="ActionBar/Buttons/ObserveButton" to="ActionBar/Buttons/ObserveButton" method="_end_hold"]
+[connection signal="pressed" from="ActionBar/Buttons/ObserveButton" to="ActionBar/Buttons/ObserveButton" method="_commit"]
+[connection signal="action_requested" from="ActionBar/Buttons/ProbeButton" to="." method="_on_action_requested"]
+[connection signal="button_down" from="ActionBar/Buttons/ProbeButton" to="ActionBar/Buttons/ProbeButton" method="_begin_hold"]
+[connection signal="button_up" from="ActionBar/Buttons/ProbeButton" to="ActionBar/Buttons/ProbeButton" method="_end_hold"]
+[connection signal="pressed" from="ActionBar/Buttons/ProbeButton" to="ActionBar/Buttons/ProbeButton" method="_commit"]
+[connection signal="action_requested" from="ActionBar/Buttons/WaitButton" to="." method="_on_action_requested"]
+[connection signal="button_down" from="ActionBar/Buttons/WaitButton" to="ActionBar/Buttons/WaitButton" method="_begin_hold"]
+[connection signal="button_up" from="ActionBar/Buttons/WaitButton" to="ActionBar/Buttons/WaitButton" method="_end_hold"]
+[connection signal="pressed" from="ActionBar/Buttons/WaitButton" to="ActionBar/Buttons/WaitButton" method="_commit"]
+[connection signal="pressed" from="PauseModal/Panel/Column/ResumeButton" to="." method="_on_resume_pressed"]
+[connection signal="pressed" from="PauseModal/Panel/Column/InformationListButton" to="." method="_on_information_list_pressed"]
+[connection signal="pressed" from="PauseModal/Panel/Column/GuideButton" to="." method="_on_guide_pressed"]
+[connection signal="pressed" from="PauseModal/Panel/Column/MainMenuButton" to="." method="_on_main_menu_pressed"]
+[connection signal="closed" from="InformationList" to="." method="_on_information_list_closed"]
+[connection signal="closed" from="GuideUI" to="." method="_on_guide_closed"]
+
+[editable path="GuideUI"]
