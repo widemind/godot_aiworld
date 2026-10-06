@@ -1,5 +1,7 @@
 # godot_aiworld
 
+全局像素溶解场景过渡已接入 `SceneTransition` Autoload。调用 `SceneTransition.change_scene_to_file(target_path)`，旧画面按方块溶解后直接露出新场景；保留全局光标和单次 CRT 处理。演示：打开 `scenes/scene_transition_demo_a.tscn` 按 F6。参数与接口见 [场景过渡](docs/scene_transition.md)。
+
 已迁移 `E:\GDWork\021-food-statement` 的世界时间轴系统。
 
 - F5 运行星球探索界面；时间轴演示可打开 `scenes/time_system_demo.tscn` 后按 F6。Esc 暂停/继续。

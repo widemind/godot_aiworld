@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/scene_transition_demo_a.tscn" id="1_demo"]
+[ext_resource type="Script" path="res://tests/scene_transition_test.gd" id="2_test"]
+
+[node name="SceneTransitionTest" type="Node"]
+
+[node name="ColdOrbit" parent="." instance=ExtResource("1_demo")]
+
+[node name="Runner" type="Node" parent="."]
+process_mode = 3
+script = ExtResource("2_test")

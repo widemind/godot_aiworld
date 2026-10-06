@@ -26,6 +26,7 @@ TextDatabase="*uid://x5gt6v5mx0sy"
 WorldJourney="*res://scripts/time/world_journey.gd"
 GameCursor="*res://scenes/effect/game_cursor.tscn"
 GlobalCRT="*res://scenes/effect/global_crt.tscn"
+SceneTransition="*res://scenes/effect/scene_transition.tscn"
 
 [display]
 

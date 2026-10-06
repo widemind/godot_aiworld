@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://csltnak8yce0w"]
+
+[ext_resource type="Script" uid="uid://dk8tw3k8h1esg" path="res://scripts/effect/scene_transition.gd" id="1_transition"]
+[ext_resource type="Shader" uid="uid://dgpgci4njegss" path="res://shaders/scene_pixel_dissolve.gdshader" id="2_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dissolve"]
+resource_local_to_scene = true
+shader = ExtResource("2_shader")
+shader_parameter/progress = 0.0
+shader_parameter/custom_resolution = Vector2(160, 90)
+
+[node name="SceneTransition" type="CanvasLayer" unique_id=187021604]
+process_mode = 3
+layer = 90
+script = ExtResource("1_transition")
+custom_resolution = Vector2(80, 45)
+
+[node name="Snapshot" type="TextureRect" parent="." unique_id=1988168023]
+visible = false
+material = SubResource("ShaderMaterial_dissolve")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
