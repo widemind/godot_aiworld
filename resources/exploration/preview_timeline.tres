@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="WorldTimeline" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="WorldTimeline" format=3 uid="uid://clmhld5igudxe"]
 
-[ext_resource type="Script" path="res://scripts/time/world_timeline.gd" id="1"]
+[ext_resource type="Script" uid="uid://vgr0qdlp5k0l" path="res://scripts/time/world_timeline.gd" id="1"]
+[ext_resource type="Script" uid="uid://dcsolxjqw7368" path="res://scripts/time/world_time_event.gd" id="1_2yyvo"]
 
 [resource]
 script = ExtResource("1")
-loop_duration = 600.0
 initial_location = &"surface"
 initial_flags = {
-&"planet_name": "水星",
-&"planet_layer": "上层"
+&"planet_layer": "上层",
+&"planet_name": "水星"
 }
